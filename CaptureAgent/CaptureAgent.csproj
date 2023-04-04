@@ -12,10 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Implementers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <EditorConfigFiles Remove="C:\Users\alexc\source\repos\ScreenCapture\CaptureAgent\.editorconfig" />
   </ItemGroup>
 

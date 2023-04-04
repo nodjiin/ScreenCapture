@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CaptureAgent.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("[controller]/[action]")]
 public class CaptureController : ControllerBase
 {
     private readonly ILogger<CaptureController> _logger;    // TODO choose a log library an add logs
