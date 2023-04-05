@@ -9,6 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IScreenRecordingService, ScreenRecordingService>();
 builder.Services.AddSingleton<IScreenshotService, ScreenshotService>();
 
+if (OperatingSystem.IsWindows()) // TODO evaluate a similar approach for ScreenshotService
+{
+    builder.Services.AddSingleton<IVideoRecorder, FFmpegWindowsWrapper>();
+}
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

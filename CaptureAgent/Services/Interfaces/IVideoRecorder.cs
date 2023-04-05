@@ -2,9 +2,8 @@
 
 namespace CaptureAgent.Services.Interfaces;
 
-public interface IScreenRecordingService
+public interface IVideoRecorder
 {
-    public bool IsRecording { get; set; }
     public Task StartRecordingAsync(RecordingOptions options);
     public Task<string> StopRecordingAsync();
 }
