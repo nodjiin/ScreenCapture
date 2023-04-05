@@ -60,7 +60,7 @@ public class CaptureController : ControllerBase
 
         try
         {
-            newFileName = await _snapshotService.TakeScreenshot(options).ConfigureAwait(false);
+            newFileName = await _snapshotService.TakeScreenshotAsync(options).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

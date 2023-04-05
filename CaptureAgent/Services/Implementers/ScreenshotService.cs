@@ -21,7 +21,7 @@ public class ScreenshotService : IScreenshotService
         _monitorConfig = monitorConfig.Value;
     }
 
-    public Task<string> TakeScreenshot(ScreenshotOptions options) => Task.Run(() =>
+    public Task<string> TakeScreenshotAsync(ScreenshotOptions options) => Task.Run(() =>
     {
         string newImageName;
 

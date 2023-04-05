@@ -3,5 +3,5 @@
 namespace CaptureAgent.Services.Interfaces;
 public interface IScreenshotService
 {
-    public Task<string> TakeScreenshot(ScreenshotOptions options);
+    public Task<string> TakeScreenshotAsync(ScreenshotOptions options);
 }
