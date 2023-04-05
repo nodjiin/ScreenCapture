@@ -15,6 +15,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddOptions<ScreenshotServiceConfiguration>().Bind(builder.Configuration.GetSection(nameof(ScreenshotServiceConfiguration))).ValidateDataAnnotations().ValidateOnStart();
+builder.Services.AddOptions<MonitorConfiguration>().Bind(builder.Configuration.GetSection(nameof(MonitorConfiguration))).ValidateDataAnnotations().ValidateOnStart();
 
 var app = builder.Build();
 
