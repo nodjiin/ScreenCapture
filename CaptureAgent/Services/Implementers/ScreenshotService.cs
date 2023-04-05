@@ -10,9 +10,9 @@ using Microsoft.Extensions.Options;
 namespace CaptureAgent.Services.Implementers;
 public class ScreenshotService : IScreenshotService
 {
-    public readonly string _fullPath;
-    public readonly ScreenshotServiceConfiguration _config;
-    public readonly MonitorConfiguration _monitorConfig;
+    private readonly string _fullPath;
+    private readonly ScreenshotServiceConfiguration _config;
+    private readonly MonitorConfiguration _monitorConfig;
 
     public ScreenshotService(IOptions<ScreenshotServiceConfiguration> config, IOptions<MonitorConfiguration> monitorConfig)
     {
