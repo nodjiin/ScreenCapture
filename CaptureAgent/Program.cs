@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // TODO add api versioning
 builder.Services.AddSingleton<IScreenRecordingService, ScreenRecordingService>();
 builder.Services.AddSingleton<IScreenshotService, ScreenshotService>();
+builder.Services.AddSingleton<IFileTransferService, FileTransferService>();
 
 if (OperatingSystem.IsWindows())
 {
