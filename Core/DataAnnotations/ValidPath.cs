@@ -2,22 +2,22 @@
 
 public class ValidPathAttribute : ValidationAttribute
 {
-    public override bool IsValid(object? value)
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
         var path = value as string;
-        if (string.IsNullOrEmpty(path))
+        if (string.IsNullOrWhiteSpace(path))
         {
-            return false;
+            return new ValidationResult("The path string is null or whitespace.");
         }
 
         try
         {
             Path.GetFullPath(path);
-            return true;
+            return ValidationResult.Success;
         }
         catch
         {
-            return false;
+            return new ValidationResult("The path is invalid.");
         }
     }
 }

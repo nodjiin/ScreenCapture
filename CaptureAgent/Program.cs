@@ -13,6 +13,7 @@ builder.Services.AddSingleton<IFileTransferService, FileTransferService>();
 if (OperatingSystem.IsWindows())
 {
     builder.Services.AddSingleton<IVideoRecorder, FFmpegWindowsWrapper>();
+    builder.Services.AddOptions<FFmpegConfiguration>().Bind(builder.Configuration.GetSection(nameof(FFmpegConfiguration))).ValidateDataAnnotations().ValidateOnStart();
     builder.Services.AddSingleton<IScreenSnapper, WindowsScreenSnapper>();
 }
 else
