@@ -1,15 +1,23 @@
-﻿using CaptureAgent.Services.Interfaces;
+﻿using CaptureAgent.Configurations;
+using CaptureAgent.Services.Interfaces;
 using Core.Dtos;
+using Microsoft.Extensions.Options;
 
 namespace CaptureAgent.Services.Implementers;
 public class ScreenRecordingService : IScreenRecordingService // TODO CancellationToken
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
+    private readonly ScreenRecordingServiceConfiguration _config;
+    private readonly string _fullPath;
     private readonly IVideoRecorder _recorder;
+    private readonly IFileTransferService _transferService;
 
-    public ScreenRecordingService(IVideoRecorder recorder)
+    public ScreenRecordingService(IOptions<ScreenRecordingServiceConfiguration> config, IVideoRecorder recorder, IFileTransferService transferService)
     {
+        _config = config.Value;
+        _fullPath = Path.GetFullPath(_config.SavePath);
         _recorder = recorder;
+        _transferService = transferService;
     }
 
     public bool IsRecording { get; set; }
@@ -27,7 +35,7 @@ public class ScreenRecordingService : IScreenRecordingService // TODO Cancellati
 
         try
         {
-            await _recorder.StartRecordingAsync(options).ConfigureAwait(false);
+            await _recorder.StartRecordingAsync(options, _fullPath).ConfigureAwait(false);
         }
         finally
         {
@@ -50,13 +58,13 @@ public class ScreenRecordingService : IScreenRecordingService // TODO Cancellati
         try
         {
             recordedVideo = await _recorder.StopRecordingAsync().ConfigureAwait(false);
-            // TODO send recorded file to server
         }
         finally
         {
             _semaphore.Release();
         }
 
+        await _transferService.SendFileAsync(Path.Combine(_fullPath, recordedVideo)).ConfigureAwait(false);
         return recordedVideo;
     }
 }

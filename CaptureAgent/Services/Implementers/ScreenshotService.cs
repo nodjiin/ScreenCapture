@@ -6,16 +6,18 @@ using Microsoft.Extensions.Options;
 namespace CaptureAgent.Services.Implementers;
 public class ScreenshotService : IScreenshotService
 {
+    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
     private readonly string _fullPath;
     private readonly ScreenshotServiceConfiguration _config;
     private readonly IScreenSnapper _snapper;
-    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+    private readonly IFileTransferService _transferService;
 
-    public ScreenshotService(IOptions<ScreenshotServiceConfiguration> config, IScreenSnapper screenSnapper)
+    public ScreenshotService(IOptions<ScreenshotServiceConfiguration> config, IScreenSnapper screenSnapper, IFileTransferService transferService)
     {
         _config = config.Value;
         _fullPath = Path.GetFullPath(_config.SavePath);
         _snapper = screenSnapper;
+        _transferService = transferService;
     }
 
     public async Task<string> TakeScreenshotAsync(ScreenshotOptions options)
@@ -32,8 +34,7 @@ public class ScreenshotService : IScreenshotService
             _semaphore.Release();
         }
 
-        // TODO send new file to server
-
+        await _transferService.SendFileAsync(Path.Combine(_fullPath, snapshotName));
         return snapshotName;
     }
 }

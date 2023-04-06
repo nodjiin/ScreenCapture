@@ -7,7 +7,7 @@ namespace CaptureAgent.Services.Implementers;
 [SupportedOSPlatform("windows")]
 public class FFmpegWindowsWrapper : IVideoRecorder
 {
-    public Task StartRecordingAsync(RecordingOptions options)
+    public Task StartRecordingAsync(RecordingOptions options, string folderPath)
     {
         throw new NotImplementedException();
     }
