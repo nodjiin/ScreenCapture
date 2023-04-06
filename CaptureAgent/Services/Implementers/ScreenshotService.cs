@@ -1,8 +1,4 @@
-﻿using System.Drawing;
-using System.Drawing.Imaging;
-using System.Globalization;
-using System.Runtime.Versioning;
-using CaptureAgent.Configurations;
+﻿using CaptureAgent.Configurations;
 using CaptureAgent.Services.Interfaces;
 using Core.Dtos;
 using Microsoft.Extensions.Options;
@@ -12,58 +8,32 @@ public class ScreenshotService : IScreenshotService
 {
     private readonly string _fullPath;
     private readonly ScreenshotServiceConfiguration _config;
-    private readonly MonitorConfiguration _monitorConfig;
+    private readonly IScreenSnapper _snapper;
+    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
-    public ScreenshotService(IOptions<ScreenshotServiceConfiguration> config, IOptions<MonitorConfiguration> monitorConfig)
+    public ScreenshotService(IOptions<ScreenshotServiceConfiguration> config, IScreenSnapper screenSnapper)
     {
         _config = config.Value;
         _fullPath = Path.GetFullPath(_config.SavePath);
-        _monitorConfig = monitorConfig.Value;
+        _snapper = screenSnapper;
     }
 
-    public Task<string> TakeScreenshotAsync(ScreenshotOptions options) => Task.Run(() =>
+    public async Task<string> TakeScreenshotAsync(ScreenshotOptions options)
     {
-        string newImageName;
+        string snapshotName;
+        await _semaphore.WaitAsync();
 
-        if (OperatingSystem.IsWindows())
+        try
         {
-            // TODO multi-monitor, specific region selection, etc.
-            (ImageFormat format, string fileExtension) = ValidateFormat(options.ImageFormat);
-            newImageName = $"{DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss", CultureInfo.InvariantCulture)}.{fileExtension}";
-            using Bitmap screenshot = new Bitmap(_monitorConfig.Width, _monitorConfig.Height);
-            using Graphics g = Graphics.FromImage(screenshot);
-            g.CopyFromScreen(0, 0, 0, 0, screenshot.Size, CopyPixelOperation.SourceCopy);
-            screenshot.Save($"{_fullPath}{newImageName}", format);
+            snapshotName = await _snapper.TakeScreenshotAsync(options, _fullPath).ConfigureAwait(false);
         }
-        else
+        finally
         {
-            // TODO multi-platform implementation
-            throw new NotImplementedException();
+            _semaphore.Release();
         }
 
-        return newImageName;
-    });
+        // TODO send new file to server
 
-    [SupportedOSPlatform("windows")]
-    private (ImageFormat format, string fileExtension) ValidateFormat(string? format)
-    {
-        if (string.IsNullOrWhiteSpace(format))
-        {
-            throw new ArgumentException($"The given image format '{format}' is invalid");
-        }
-
-        // TODO expand
-        switch (format.ToLowerInvariant().Trim())
-        {
-            case "jpeg":
-            case "jpg":
-                return (ImageFormat.Jpeg, "jpg");
-            case "png":
-                return (ImageFormat.Png, "png");
-            case "bmp":
-                return (ImageFormat.Bmp, "bmp");
-            default:
-                throw new ArgumentException($"The given image format '{format}' is invalid");
-        }
+        return snapshotName;
     }
 }

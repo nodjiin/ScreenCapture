@@ -9,9 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IScreenRecordingService, ScreenRecordingService>();
 builder.Services.AddSingleton<IScreenshotService, ScreenshotService>();
 
-if (OperatingSystem.IsWindows()) // TODO evaluate a similar approach for ScreenshotService
+if (OperatingSystem.IsWindows())
 {
     builder.Services.AddSingleton<IVideoRecorder, FFmpegWindowsWrapper>();
+    builder.Services.AddSingleton<IScreenSnapper, WindowsScreenSnapper>();
+}
+else
+{
+    // TODO multi-platform implementation
+    throw new NotImplementedException("The only OS currently supported is windows.");
 }
 
 builder.Services.AddControllers();
