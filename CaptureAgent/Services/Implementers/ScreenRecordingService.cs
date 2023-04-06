@@ -4,7 +4,7 @@ using Core.Dtos;
 using Microsoft.Extensions.Options;
 
 namespace CaptureAgent.Services.Implementers;
-public class ScreenRecordingService : IScreenRecordingService // TODO CancellationToken
+public class ScreenRecordingService : IScreenRecordingService
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly ScreenRecordingServiceConfiguration _config;
