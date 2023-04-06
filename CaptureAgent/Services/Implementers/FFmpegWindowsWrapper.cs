@@ -37,6 +37,7 @@ public class FFmpegWindowsWrapper : IVideoRecorder
         _ffmpeg.Start();
     });
 
+    //TODO argument validation
     private string GenerateFFmpegArguments(RecordingOptions options, string folderPath)
     {
         _filename = $"{DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss", CultureInfo.InvariantCulture)}.mkv";
