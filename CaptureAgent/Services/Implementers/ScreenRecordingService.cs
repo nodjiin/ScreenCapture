@@ -37,6 +37,11 @@ public class ScreenRecordingService : IScreenRecordingService
         {
             await _recorder.StartRecordingAsync(options, _fullPath).ConfigureAwait(false);
         }
+        catch (Exception)
+        {
+            IsRecording = false;
+            throw;
+        }
         finally
         {
             _semaphore.Release();
