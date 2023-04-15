@@ -8,7 +8,7 @@ namespace CaptureAgent.Controllers;
 [Route("[controller]/[action]")]
 public class CaptureController : ControllerBase
 {
-    private readonly ILogger<CaptureController> _logger;    // TODO choose a log library an add logs
+    private readonly ILogger<CaptureController> _logger;
     private readonly IScreenRecordingService _screenRecordingService;
     private readonly IScreenshotService _snapshotService;
 
@@ -22,6 +22,7 @@ public class CaptureController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> StartRecording([FromBody] RecordingOptions options)
     {
+        _logger.LogInformation("Received new start recording request.");
         try
         {
             await _screenRecordingService.StartRecordingAsync(options).ConfigureAwait(false);
@@ -40,6 +41,7 @@ public class CaptureController : ControllerBase
     {
         string newFileName;
 
+        _logger.LogInformation("Received new stop recording request.");
         try
         {
             newFileName = await _screenRecordingService.StopRecordingAsync().ConfigureAwait(false);
@@ -58,6 +60,7 @@ public class CaptureController : ControllerBase
     {
         string newFileName;
 
+        _logger.LogInformation("Received new snapshot request.");
         try
         {
             newFileName = await _snapshotService.TakeScreenshotAsync(options).ConfigureAwait(false);
