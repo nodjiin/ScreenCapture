@@ -30,6 +30,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddOptions<ScreenRecordingServiceConfiguration>().Bind(builder.Configuration.GetSection(nameof(ScreenRecordingServiceConfiguration))).ValidateDataAnnotations().ValidateOnStart();
 builder.Services.AddOptions<ScreenshotServiceConfiguration>().Bind(builder.Configuration.GetSection(nameof(ScreenshotServiceConfiguration))).ValidateDataAnnotations().ValidateOnStart();
 builder.Services.AddOptions<MonitorConfiguration>().Bind(builder.Configuration.GetSection(nameof(MonitorConfiguration))).ValidateDataAnnotations().ValidateOnStart();
+builder.Services.AddOptions<FtpServerConfiguration>().Bind(builder.Configuration.GetSection(nameof(FtpServerConfiguration))).ValidateDataAnnotations().ValidateOnStart();
 
 var app = builder.Build();
 
