@@ -1,9 +1,18 @@
-﻿namespace CaptureAgent.Configurations;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace CaptureAgent.Configurations;
 public class FtpServerConfiguration
 {
-    public string? Ip { get; set; }
+    [Required(AllowEmptyStrings = false)]
+    public string Ip { get; set; } = string.Empty;
+
+    [Range(0, 65535)]
     public int Port { get; set; }
-    public string? UserName { get; set; }
-    public string? Password { get; set; }
+
+    [Required(AllowEmptyStrings = false)]
+    public string UserName { get; set; } = string.Empty;
+
+    [Required(AllowEmptyStrings = false)]
+    public string Password { get; set; } = string.Empty;
 }
 
