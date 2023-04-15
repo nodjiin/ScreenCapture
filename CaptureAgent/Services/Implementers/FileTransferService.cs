@@ -33,8 +33,8 @@ public class FileTransferService : IFileTransferService
         };
 
         var client = new AsyncFtpClient(_config.Ip, _config.UserName, _config.Password, _config.Port, ftpConfig);
-        await client.Connect();
-        await client.UploadFile(filePath, Path.GetFileName(filePath));
+        await client.Connect().ConfigureAwait(false);
+        await client.UploadFile(filePath, Path.GetFileName(filePath)).ConfigureAwait(false);
 
         // end FluentFTP
 

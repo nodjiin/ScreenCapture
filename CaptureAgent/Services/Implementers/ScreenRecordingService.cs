@@ -20,18 +20,18 @@ public class ScreenRecordingService : IScreenRecordingService
         _transferService = transferService;
     }
 
-    public bool IsRecording { get; set; }
+    public RecordingStatus Status { get; set; }
 
     public async Task StartRecordingAsync(RecordingOptions options)
     {
         await _semaphore.WaitAsync();
-        if (IsRecording)
+        if (Status == RecordingStatus.Recording)
         {
             _semaphore.Release();
             return;
         }
 
-        IsRecording = true;
+        Status = RecordingStatus.Recording;
 
         try
         {
@@ -39,7 +39,7 @@ public class ScreenRecordingService : IScreenRecordingService
         }
         catch (Exception)
         {
-            IsRecording = false;
+            Status = RecordingStatus.Idle;
             throw;
         }
         finally
@@ -51,13 +51,13 @@ public class ScreenRecordingService : IScreenRecordingService
     public async Task<string> StopRecordingAsync()
     {
         await _semaphore.WaitAsync();
-        if (!IsRecording)
+        if (Status == RecordingStatus.Idle)
         {
             _semaphore.Release();
             return string.Empty;
         }
 
-        IsRecording = false;
+        Status = RecordingStatus.Idle;
         string recordedVideo;
 
         try

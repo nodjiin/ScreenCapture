@@ -97,7 +97,8 @@ public class FFmpegWindowsWrapper : IVideoRecorder
 
     public async Task<string> StopRecordingAsync()
     {
-        await _ffmpeg.StandardInput.WriteAsync("q");
+        await _ffmpeg.StandardInput.WriteAsync("q").ConfigureAwait(false);
+        await _ffmpeg.WaitForExitAsync().ConfigureAwait(false);
         return _filename;
     }
 }
