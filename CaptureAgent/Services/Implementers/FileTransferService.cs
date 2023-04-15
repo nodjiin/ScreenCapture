@@ -6,18 +6,20 @@ using Microsoft.Extensions.Options;
 namespace CaptureAgent.Services.Implementers;
 public class FileTransferService : IFileTransferService
 {
+    private readonly ILogger<FileTransferService> _logger;
     private readonly FtpServerConfiguration _config;
 
-    public FileTransferService(IOptions<FtpServerConfiguration> config)
+    public FileTransferService(IOptions<FtpServerConfiguration> config, ILogger<FileTransferService> logger)
     {
         _config = config.Value;
+        _logger = logger;
     }
 
     public async Task SendFileAsync(string filePath, bool deleteLocalFile = true)
     {
         if (!File.Exists(filePath))
         {
-            throw new FileNotFoundException($"No file to send has been at path: '{filePath}'");
+            throw new FileNotFoundException($"No file to send has been found at path: '{filePath}'.");
         }
 
         // The current implementation uses FluentFTP to handle the server connection. I'm creating the client class here
@@ -44,12 +46,12 @@ public class FileTransferService : IFileTransferService
             }
             catch (Exception ex)
             {
-                // TODO log
+                _logger.LogError(ex, $"Failed to cleanup the file '{filePath}'.");
             }
         }
         else
         {
-            // TODO log
+            _logger.LogInformation($"Keeping local version of file '{filePath}'.");
         }
 
     }
