@@ -2,26 +2,26 @@
 using Core.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CaptureAgent.Controllers
+namespace CaptureAgent.Controllers;
+
+[ApiController]
+[Route("[controller]/[action]")]
+[ApiVersion("1.0")]
+public class StatusController : ControllerBase
 {
-    [ApiController]
-    [Route("[controller]/[action]")]
-    public class StatusController : ControllerBase
+    private readonly IScreenRecordingService _recordingService;
+
+    public StatusController(IScreenRecordingService recordingService)
     {
-        private readonly IScreenRecordingService _recordingService;
+        _recordingService = recordingService;
+    }
 
-        public StatusController(IScreenRecordingService recordingService)
+    [HttpGet]
+    public IActionResult GetStatus()
+    {
+        return Ok(new CaptureAgentStatus()
         {
-            _recordingService = recordingService;
-        }
-
-        [HttpGet]
-        public IActionResult GetStatus()
-        {
-            return Ok(new CaptureAgentStatus()
-            {
-                RecordingStatus = _recordingService.Status
-            });
-        }
+            RecordingStatus = _recordingService.Status
+        });
     }
 }

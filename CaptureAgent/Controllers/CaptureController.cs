@@ -6,6 +6,7 @@ namespace CaptureAgent.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
+[ApiVersion("1.0")]
 public class CaptureController : ControllerBase
 {
     private readonly ILogger<CaptureController> _logger;
