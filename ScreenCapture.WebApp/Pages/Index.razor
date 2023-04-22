@@ -1,9 +1,14 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Welcome to the Screen Capture web application</h1>
 
-Welcome to your new app.
-
-<SurveyPrompt Title="How is Blazor working for you?" />
+<AuthorizeView>
+    <Authorized>
+        TODO app description
+    </Authorized>
+    <NotAuthorized>
+        <text>Please <a class="link-primary" href="Identity/Account/Register">Register</a> or <a class="link-primary" href="Identity/Account/Login">Log in</a> to use the application.</text>
+    </NotAuthorized>
+</AuthorizeView>
