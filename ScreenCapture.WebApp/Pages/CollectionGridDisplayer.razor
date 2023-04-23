@@ -68,7 +68,13 @@ else
         // With this we create the grid to have either 3 or 4 elements on each row,
         // with the last row being as full as possible
         int itemsNumber = Collection.Count;
-        if (itemsNumber % 4 == 0)
+        if (itemsNumber <= 4)
+        {
+            rowLength = itemsNumber;
+            rowNumber = 1;
+            return;
+        }
+        else if (itemsNumber % 4 == 0)
         {
             rowLength = 4;
         } 

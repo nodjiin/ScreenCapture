@@ -1,22 +1,27 @@
-﻿namespace ScreenCapture.WebApp.Objects;
+﻿using ScreenCapture.WebApp.Configurations;
 
-public class RemoteAgent
+namespace ScreenCapture.WebApp.Domain;
+
+public class RemoteAgent : IRemoteAgent
 {
-    public RemoteAgent(string ip, string label)
+    private readonly HttpClient _client;
+
+    public RemoteAgent(RemoteAgentConfiguration config, HttpClient client)
     {
-        Ip = ip;
-        Label = label;
+        Ip = config.Ip;
+        Label = string.IsNullOrWhiteSpace(config.Label) ? config.Ip : config.Label;
+        _client = client;
     }
 
     public string Ip { get; init; }
     public string Label { get; init; }
     public RemoteAgentStatus Status { get; private set; }
-
     public DateTime? LastOnline { get; private set; }
 
     public Task UpdateStatusAsync()
     {
-        throw new NotImplementedException();
+        // TODO NEXT
+        return Task.CompletedTask;
     }
 
     public Task StartRecordingAsync()

@@ -2,7 +2,10 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ScreenCapture.WebApp.Areas.Identity;
+using ScreenCapture.WebApp.Configurations;
 using ScreenCapture.WebApp.Data;
+using ScreenCapture.WebApp.Services.Implementers;
+using ScreenCapture.WebApp.Services.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +20,9 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddSingleton<IRemoteAgentsMonitor, RemoteAgentsMonitor>();
+builder.Services.AddHttpClient();
+builder.Services.AddOptions<List<RemoteAgentConfiguration>>().Bind(builder.Configuration.GetSection("RemoteAgentsConfigurations")).ValidateDataAnnotations().ValidateOnStart();
 
 var app = builder.Build();
 

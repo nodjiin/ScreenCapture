@@ -1,4 +1,6 @@
-﻿@using ScreenCapture.WebApp.Objects;
+﻿@using ScreenCapture.WebApp.Services.Interface;
+@inject IRemoteAgentsMonitor monitor
+
 
 <CollectionGridDisplayer Collection="agents">
     <EmptyCollectionTemplate>
@@ -12,20 +14,12 @@
 
 
 @code {
-    private List<RemoteAgent> agents;
+    private List<IRemoteAgent> agents;
 
     protected override void OnInitialized()
     {
-        agents = new List<RemoteAgent>()
-        {
-            new RemoteAgent("t1", "t1"),
-            new RemoteAgent("t2", "t2"),
-            new RemoteAgent("t2", "t2"),
-            new RemoteAgent("t2", "t2"),
-            new RemoteAgent("t2", "t2"),
-            new RemoteAgent("t2", "t2"),
-            new RemoteAgent("t2", "t2"),
-        };
+        monitor.StartMonitoring();
+        agents = monitor.RemoteAgents;
 
         base.OnInitialized();
     }
