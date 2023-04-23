@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CaptureAgent", "CaptureAgen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{DE10A431-9FCD-4319-A3AA-5DD5C95F5C97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScreenCapture.WebApp", "ScreenCapture.WebApp\ScreenCapture.WebApp.csproj", "{4E746C84-0365-44E7-9644-7FC5ABEE3278}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScreenCapture.WebApp", "ScreenCapture.WebApp\ScreenCapture.WebApp.csproj", "{4E746C84-0365-44E7-9644-7FC5ABEE3278}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

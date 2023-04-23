@@ -1,0 +1,35 @@
+﻿@page "/RemoteAgents"
+
+@using ScreenCapture.WebApp.Objects;
+
+<CollectionGridDisplayer Collection="agents">
+    <EmptyCollectionTemplate>
+        <text>No agent has been configured.</text>
+    </EmptyCollectionTemplate>
+    <CollectionItemTemplate>
+        <RemoteAgentCard Agent="context" />
+    </CollectionItemTemplate>
+</CollectionGridDisplayer>
+
+
+
+@code {
+    private List<RemoteAgent> agents;
+
+    protected override void OnInitialized()
+    {
+
+        agents = new List<RemoteAgent>()
+        {
+            new RemoteAgent("t1", "t1"),
+            new RemoteAgent("t2", "t2"),
+            new RemoteAgent("t2", "t2"),
+            new RemoteAgent("t2", "t2"),
+            new RemoteAgent("t2", "t2"),
+            new RemoteAgent("t2", "t2"),
+            new RemoteAgent("t2", "t2"),
+        };
+
+        base.OnInitialized();
+    }
+}

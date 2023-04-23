@@ -1,0 +1,77 @@
+﻿@typeparam TCollectionItem
+
+@if(Collection == null || Collection.Count == 0)
+{
+    if (EmptyCollectionTemplate != null)
+    {
+        @EmptyCollectionTemplate
+    }
+    else
+    {
+        <text>The collection is empty.</text>
+    }
+}
+else if(CollectionItemTemplate == null)
+{
+    @for (int i = 0; i < Collection.Count; i++)
+    {
+        <text><b>[@i]</b> @Collection[i]?.ToString()</text>
+    }
+}
+else
+{
+    <div class="container text-center">
+        @for(int i = 0; i < rowNumber; i++)
+        {
+            <div class="row gy-3 mt-3">
+                @for (int j = i * rowLength; j < Collection.Count && j < (i + 1) * rowLength; j++)
+                {
+                    <div class="col">
+                        @CollectionItemTemplate(Collection[j])
+                    </div>
+                }
+            </div>            
+        }
+    </div>
+}
+
+@code {
+    private int rowLength;
+    private int rowNumber;
+
+    [Parameter] public RenderFragment? EmptyCollectionTemplate { get; set; }
+    [Parameter] public RenderFragment<TCollectionItem>? CollectionItemTemplate { get; set; }
+    [Parameter] public List<TCollectionItem>? Collection { get; set; }
+
+    protected override void OnInitialized()
+    {
+        CalculateGridDimension();
+        base.OnInitialized();
+    }
+
+    private void CalculateGridDimension()
+    {
+        if (Collection == null || Collection.Count == 0)
+        {
+            return;
+        }
+
+        // With this we create the grid to have either 3 or 4 elements on each row,
+        // with the last row being as full as possible
+        int itemsNumber = Collection.Count;
+        if (itemsNumber % 4 == 0)
+        {
+            rowLength = 4;
+        } 
+        else if (itemsNumber  % 3 == 0)
+        {
+            rowLength = 3;
+        }
+        else
+        {
+            rowLength = itemsNumber % 4 > itemsNumber % 3 ? 4 : 3;
+        }
+
+        rowNumber = (int) Math.Ceiling( (decimal)itemsNumber / rowLength);
+    }
+}

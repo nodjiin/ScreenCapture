@@ -1,0 +1,23 @@
+﻿@using ScreenCapture.WebApp.Objects;
+
+@if(Agent == null)
+{
+    //TODO bad configuration image
+}
+else
+{
+    <div class="card" style="width: 18rem;">
+        <img class="card-img-top" src="..." alt="Remote agent image">
+        <div class="card-body">
+            <h5 class="card-title">@Agent.Label</h5>
+            <p class="card-text">bla bla bla</p>
+        </div>
+        <div class="card-body">
+            TODO buttons
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public RemoteAgent? Agent { get; set; }
+}
