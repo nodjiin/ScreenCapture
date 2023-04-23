@@ -30,6 +30,14 @@ else
                         @CollectionItemTemplate(Collection[j])
                     </div>
                 }
+                @if(i == rowNumber - 1)
+                {
+                    @* Fill final grid cells by adding some empty div *@
+                    @for(int k = 0; k < emptyColumns; k++)
+                    {
+                        <div class="col"/>
+                    }
+                }
             </div>            
         }
     </div>
@@ -38,6 +46,7 @@ else
 @code {
     private int rowLength;
     private int rowNumber;
+    private int emptyColumns;
 
     [Parameter] public RenderFragment? EmptyCollectionTemplate { get; set; }
     [Parameter] public RenderFragment<TCollectionItem>? CollectionItemTemplate { get; set; }
@@ -73,5 +82,6 @@ else
         }
 
         rowNumber = (int) Math.Ceiling( (decimal)itemsNumber / rowLength);
+        emptyColumns = rowNumber * rowLength - itemsNumber;
     }
 }
