@@ -2,13 +2,13 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Welcome to the Screen Capture web application</h1>
-
 <AuthorizeView>
-    <Authorized>
-        TODO app description
-    </Authorized>
     <NotAuthorized>
+        <h1>Welcome to the Screen Capture web application</h1>
+
         <text>Please <a class="link-primary" href="Identity/Account/Register">Register</a> or <a class="link-primary" href="Identity/Account/Login">Log in</a> to use the application.</text>
     </NotAuthorized>
+    <Authorized>
+        <RemoteAgentsDisplayer />
+    </Authorized>
 </AuthorizeView>
