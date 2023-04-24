@@ -42,6 +42,8 @@ else
         {
             case(RemoteAgentStatus.Online):
                 return "text-success";
+            case (RemoteAgentStatus.Error): // yellow since red is already used to identify active recording
+                return "text-warning";
             case (RemoteAgentStatus.Recording):
                 return "text-danger";
             case (RemoteAgentStatus.Offline):
