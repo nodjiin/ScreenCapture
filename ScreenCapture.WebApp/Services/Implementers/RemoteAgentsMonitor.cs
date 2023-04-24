@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using ScreenCapture.WebApp.Configurations;
 using ScreenCapture.WebApp.Domain;
-using ScreenCapture.WebApp.Services.Interface;
+using ScreenCapture.WebApp.Services.Interfaces;
 
 namespace ScreenCapture.WebApp.Services.Implementers
 {
@@ -12,14 +12,13 @@ namespace ScreenCapture.WebApp.Services.Implementers
         private bool _isStarted;
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public RemoteAgentsMonitor(IOptions<List<RemoteAgentConfiguration>> config, IHttpClientFactory httpClientFactory)
+        public RemoteAgentsMonitor(IOptions<List<RemoteAgentConfiguration>> config, IRemoteAgentCommunicationManager communicationManager)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
-            HttpClient http = httpClientFactory.CreateClient();
             RemoteAgents = new List<IRemoteAgent>();
             foreach (var agentConfig in config.Value)
             {
-                RemoteAgents.Add(new RemoteAgent(agentConfig, http));
+                RemoteAgents.Add(new RemoteAgent(agentConfig, communicationManager));
             }
         }
 

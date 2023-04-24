@@ -1,6 +1,6 @@
 ﻿using ScreenCapture.WebApp.Domain;
 
-namespace ScreenCapture.WebApp.Services.Interface
+namespace ScreenCapture.WebApp.Services.Interfaces
 {
     public interface IRemoteAgentsMonitor
     {
