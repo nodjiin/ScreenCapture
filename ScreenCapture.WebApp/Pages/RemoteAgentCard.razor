@@ -31,7 +31,7 @@ else
 }
 
 @code {
-    private bool IsDisabled() => Agent?.Status == RemoteAgentStatus.Offline ? true : false;
+    private bool IsDisabled() => Agent?.Status == RemoteAgentStatus.Offline || Agent?.Status == RemoteAgentStatus.Error ? true : false;
     private ScreenshotOptions screenshotOptions = new ScreenshotOptions();
     private RecordingOptions recordingOptions = new RecordingOptions();
     [Parameter] public IRemoteAgent? Agent { get; set; }

@@ -1,6 +1,7 @@
 ﻿using Core.Dtos;
 using ScreenCapture.WebApp.Domain;
 using ScreenCapture.WebApp.Services.Interfaces;
+using Core.Extension;
 
 namespace ScreenCapture.WebApp.Services.Implementers;
 public class RemoteAgentCommunicationManager : IRemoteAgentCommunicationManager
@@ -48,7 +49,7 @@ public class RemoteAgentCommunicationManager : IRemoteAgentCommunicationManager
             var response = await _client.GetAsync(endpoint).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
-                _logger.LogError($"Unsuccessful call to GetStatusAsync with code: '{response.StatusCode}' and reason: '{response.ReasonPhrase}'");
+                _logger.LogUnsuccessfulHttpResponse(response);
                 return RemoteAgentStatus.Error;
             }
 
