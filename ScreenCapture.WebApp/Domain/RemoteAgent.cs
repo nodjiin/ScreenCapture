@@ -7,6 +7,7 @@ namespace ScreenCapture.WebApp.Domain;
 public class RemoteAgent : IRemoteAgent
 {
     private readonly IRemoteAgentCommunicationManager _communicationManager;
+    private RemoteAgentStatus _status = RemoteAgentStatus.Offline;
 
     public RemoteAgent(RemoteAgentConfiguration config, IRemoteAgentCommunicationManager communicationManager)
     {
@@ -16,10 +17,21 @@ public class RemoteAgent : IRemoteAgent
         _communicationManager = communicationManager;
     }
 
+    public event Func<Task>? OnStatusChanged;
+
     public string Ip { get; init; }
     public string Port { get; init; }
     public string Label { get; init; }
-    public RemoteAgentStatus Status { get; private set; }
+    public RemoteAgentStatus Status
+    {
+        get => _status;
+        private set
+        {
+            _status = value;
+            _ = OnStatusChanged?.Invoke();
+        }
+    }
+
     public DateTime? LastOnline { get; private set; }
 
     // TODO think about the necessity of locking during status update.

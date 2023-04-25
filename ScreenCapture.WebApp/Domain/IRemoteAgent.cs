@@ -2,7 +2,7 @@
 
 namespace ScreenCapture.WebApp.Domain
 {
-    public interface IRemoteAgent
+    public interface IRemoteAgent : INotifyStatusChanged
     {
         string Ip { get; init; }
         string Label { get; init; }

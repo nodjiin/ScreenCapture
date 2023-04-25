@@ -1,4 +1,6 @@
 ﻿@using Core.Dtos;
+@implements IDisposable
+
 @if(Agent == null)
 {
     //TODO bad configuration card
@@ -36,6 +38,21 @@ else
     private RecordingOptions recordingOptions = new RecordingOptions();
     [Parameter] public IRemoteAgent? Agent { get; set; }
 
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (Agent != null)
+        {
+            Agent.OnStatusChanged += UpdateAfterChange;
+        }
+
+        base.OnAfterRender(firstRender);
+    }
+
+    private async Task UpdateAfterChange()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
     private string GetStatusColor()
     {
         switch (Agent?.Status)
@@ -49,6 +66,14 @@ else
             case (RemoteAgentStatus.Offline):
             default:
                 return "text-dark";
+        }
+    }
+
+    public void Dispose()
+    {
+        if (Agent != null)
+        {
+            Agent.OnStatusChanged -= UpdateAfterChange;
         }
     }
 }
