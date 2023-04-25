@@ -40,21 +40,36 @@ public class RemoteAgent : IRemoteAgent
 
     public async Task UpdateStatusAsync()
     {
-        Status = await _communicationManager.GetStatusAsync(this).ConfigureAwait(false);
+        var newStatus = await _communicationManager.GetStatusAsync(this).ConfigureAwait(false);
+        if (newStatus != RemoteAgentStatus.Offline)
+        {
+            // TODO Local time is being used both to name captured media file and to keep track of the
+            // agent on line present. I need to check how this is going to impact Blazor server on a multiple
+            // timezone scenario. This code is running on the server which means the DateTime displayed in the 
+            // browser is automatically converted?
+            LastOnline = DateTime.Now;
+        }
+
+        Status = newStatus;
     }
 
-    public async Task StartRecordingAsync(RecordingOptions options)
+    public async Task<CaptureOperationReport> StartRecordingAsync(RecordingOptions options)
     {
-        Status = await _communicationManager.StartRecordingAsync(this, options).ConfigureAwait(false);
+        var report = await _communicationManager.StartRecordingAsync(this, options).ConfigureAwait(false);
+        Status = report.AgentStatusAfterOperation;
+        return report;
     }
 
-    public async Task StopRecordingAsync()
+    public async Task<CaptureOperationReport> StopRecordingAsync()
     {
-        Status = await _communicationManager.StopRecordingAsync(this).ConfigureAwait(false);
+        var report = await _communicationManager.StopRecordingAsync(this).ConfigureAwait(false);
+        Status = report.AgentStatusAfterOperation;
+        return report;
     }
-    public async Task TakeScreenshotAsync(ScreenshotOptions options)
+    public async Task<CaptureOperationReport> TakeScreenshotAsync(ScreenshotOptions options)
     {
-        Status = await _communicationManager.TakeSnapshotAsync(this, options).ConfigureAwait(false);
+        var report = await _communicationManager.TakeSnapshotAsync(this, options).ConfigureAwait(false);
+        return report;
     }
 
     public override string ToString()

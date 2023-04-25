@@ -10,9 +10,9 @@ namespace ScreenCapture.WebApp.Domain
         DateTime? LastOnline { get; }
         RemoteAgentStatus Status { get; }
 
-        Task StartRecordingAsync(RecordingOptions options);
-        Task StopRecordingAsync();
-        Task TakeScreenshotAsync(ScreenshotOptions options);
+        Task<CaptureOperationReport> StartRecordingAsync(RecordingOptions options);
+        Task<CaptureOperationReport> StopRecordingAsync();
+        Task<CaptureOperationReport> TakeScreenshotAsync(ScreenshotOptions options);
         Task UpdateStatusAsync();
     }
 }

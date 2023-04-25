@@ -23,51 +23,56 @@ public class RemoteAgentCommunicationManager : IRemoteAgentCommunicationManager
     // An exception raised in during any get/post request to the agent likely means that the remote agent is offline,
     // therefore it's going to be simply logged as a warning
 
-    public async Task<RemoteAgentStatus> StartRecordingAsync(IRemoteAgent agent, RecordingOptions options)
+    public async Task<CaptureOperationReport> StartRecordingAsync(IRemoteAgent agent, RecordingOptions options)
     {
-        var endpoint = _startRecordingEndpointTemplate.Replace("<ip:port>", IpPort(agent));
+        string endpoint = _startRecordingEndpointTemplate.Replace("<ip:port>", IpPort(agent));
         try
         {
             var response = await _client.PostAsync(endpoint, HttpContentGenerator.ConvertToJson(options)).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogUnsuccessfulHttpResponse(response);
-                return RemoteAgentStatus.Error;
+                return CaptureOperationReport.ErrorReport(response.StatusCode);
             }
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, $"Exception raised while trying to assert the status of {agent}");
-            return RemoteAgentStatus.Offline;
+            _logger.LogWarning(ex, $"Exception raised while trying to start a recording session on {agent}");
+            return CaptureOperationReport.OfflineReport();
         }
 
-        return RemoteAgentStatus.Recording;
+        return CaptureOperationReport.SuccessfulReport(RemoteAgentStatus.Recording);
     }
 
-    public async Task<RemoteAgentStatus> StopRecordingAsync(IRemoteAgent agent)
+    public async Task<CaptureOperationReport> StopRecordingAsync(IRemoteAgent agent)
     {
-        var endpoint = _stopRecordingEndpointTemplate.Replace("<ip:port>", IpPort(agent));
+        string endpoint = _stopRecordingEndpointTemplate.Replace("<ip:port>", IpPort(agent));
+        string newFileName;
+
         try
         {
             var response = await _client.PostAsync(endpoint, null).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogUnsuccessfulHttpResponse(response);
-                return RemoteAgentStatus.Error;
+                return CaptureOperationReport.ErrorReport(response.StatusCode);
             }
+
+            newFileName = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, $"Exception raised while trying to assert the status of {agent}");
-            return RemoteAgentStatus.Offline;
+            _logger.LogWarning(ex, $"Exception raised while trying stop a recoding session on {agent}");
+            return CaptureOperationReport.OfflineReport();
         }
 
-        return RemoteAgentStatus.Online;
+        return CaptureOperationReport.SuccessfulReport(RemoteAgentStatus.Online, newFileName);
     }
 
-    public async Task<RemoteAgentStatus> TakeSnapshotAsync(IRemoteAgent agent, ScreenshotOptions options)
+    public async Task<CaptureOperationReport> TakeSnapshotAsync(IRemoteAgent agent, ScreenshotOptions options)
     {
-        var endpoint = _takeSnapshotEndpointTemplate.Replace("<ip:port>", IpPort(agent));
+        string endpoint = _takeSnapshotEndpointTemplate.Replace("<ip:port>", IpPort(agent));
+        string newFileName;
 
         try
         {
@@ -75,21 +80,23 @@ public class RemoteAgentCommunicationManager : IRemoteAgentCommunicationManager
             if (!response.IsSuccessStatusCode)
             {
                 _logger.LogUnsuccessfulHttpResponse(response);
-                return RemoteAgentStatus.Error;
+                return CaptureOperationReport.ErrorReport(response.StatusCode);
             }
+
+            newFileName = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, $"Exception raised while trying to assert the status of {agent}");
-            return RemoteAgentStatus.Offline;
+            _logger.LogWarning(ex, $"Exception raised while trying to take a snapshot on {agent}");
+            return CaptureOperationReport.OfflineReport();
         }
 
-        return RemoteAgentStatus.Recording;
+        return CaptureOperationReport.SuccessfulReport(RemoteAgentStatus.Online, newFileName);
     }
 
     public async Task<RemoteAgentStatus> GetStatusAsync(IRemoteAgent agent)
     {
-        var endpoint = _getStatusEndpointTemplate.Replace("<ip:port>", IpPort(agent));
+        string endpoint = _getStatusEndpointTemplate.Replace("<ip:port>", IpPort(agent));
 
         try
         {

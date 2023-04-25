@@ -1,7 +1,5 @@
-﻿namespace ScreenCapture.WebApp.Domain
+﻿namespace ScreenCapture.WebApp.Domain;
+public interface INotifyStatusChanged
 {
-    public interface INotifyStatusChanged
-    {
-        public event Func<Task>? OnStatusChanged;
-    }
+    public event Func<Task>? OnStatusChanged;
 }
