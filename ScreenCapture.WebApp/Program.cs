@@ -19,9 +19,9 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
-builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddSingleton<IRemoteAgentsMonitor, RemoteAgentsMonitor>();
 builder.Services.AddSingleton<IRemoteAgentCommunicationManager, RemoteAgentCommunicationManager>();
+
 builder.Services.AddHttpClient();
 builder.Services.AddOptions<List<RemoteAgentConfiguration>>().Bind(builder.Configuration.GetSection("RemoteAgentsConfigurations")).ValidateDataAnnotations().ValidateOnStart();
 
