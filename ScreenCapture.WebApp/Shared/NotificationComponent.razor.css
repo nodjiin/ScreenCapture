@@ -1,0 +1,8 @@
+﻿.notification-container {
+    display: flex;
+    position: fixed;
+    justify-content: center;
+    bottom: 0;
+    margin-bottom: 3rem;
+    width: 100%;
+}

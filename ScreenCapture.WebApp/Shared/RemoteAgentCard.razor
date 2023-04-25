@@ -1,0 +1,158 @@
+﻿@using Core.Dtos;
+@using ScreenCapture.WebApp.Services.Implementers;
+@implements IDisposable
+
+@if(Agent == null)
+{
+    //TODO bad configuration card
+}
+else
+{
+    <div class="card" style="width: 18rem;">
+        <i class="card-img-top bi bi-display fs-1"></i>
+        <div class="card-body">
+            <h6 class="card-title">@Agent.Label</h6>
+            <i class="bi bi-record-fill @GetStatusColor()"></i> @Agent.Status.ToString()
+
+            @if (Agent.Status == RemoteAgentStatus.Offline && Agent.LastOnline != null)
+            {
+                <p class="card-text">Last seen on line: '@Agent.LastOnline.ToString()'</p>
+            }
+        </div>
+        <div class="card-body">
+            @if (Agent.Status == RemoteAgentStatus.Recording)
+            {
+                <button class="btn btn-secondary me-1" @onclick="OnStopRecordingButtonClickAsync" disabled="@IsDisabled()"><i class="bi bi-stop-fill"></i></button>
+            }
+            else
+            {
+                <button class="btn btn-secondary me-1" @onclick="OnStartRecordingButtonClickAsync" disabled="@IsDisabled()"><i class="bi bi-record"></i></button>
+            }
+            <button class="btn btn-secondary ms-1" @onclick="OnTakeScreenshotButtonClickAsync" disabled="@IsDisabled()"><i class="bi bi-camera"></i></button>
+        </div>
+    </div>
+}
+
+@code {
+    private bool IsDisabled() => Agent?.Status == RemoteAgentStatus.Offline || Agent?.Status == RemoteAgentStatus.Error ? true : false;
+    private ScreenshotOptions screenshotOptions = new ScreenshotOptions();
+    private RecordingOptions recordingOptions = new RecordingOptions();
+    [Parameter] public IRemoteAgent? Agent { get; set; }
+    [CascadingParameter] NotificationComponent? Notification { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (Agent != null)
+        {
+            Agent.OnStatusChanged += UpdateAfterChange;
+        }
+
+        base.OnAfterRender(firstRender);
+    }
+
+    private async Task UpdateAfterChange()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private string GetStatusColor()
+    {
+        switch (Agent?.Status)
+        {
+            case(RemoteAgentStatus.Online):
+                return "text-success";
+            case (RemoteAgentStatus.Error): // yellow since red is already used to identify active recording
+                return "text-warning";
+            case (RemoteAgentStatus.Recording):
+                return "text-danger";
+            case (RemoteAgentStatus.Offline):
+            default:
+                return "text-dark";
+        }
+    }
+
+    // TODO notification service
+
+    private async Task OnStartRecordingButtonClickAsync()
+    {
+        if (Agent == null)
+        {
+            return;
+        }
+
+        var report = await Agent.StartRecordingAsync(recordingOptions);
+        if (Notification == null)
+        {
+            return;
+        }
+
+        if (!report.IsSuccessful)
+        {
+            await Notification.RaiseNotification($"Starting the recording operation has failed with error: [{report.StatusCode}]", NotificationLevel.Error);
+        }
+    }
+
+    private async Task OnStopRecordingButtonClickAsync()
+    {
+        if (Agent == null)
+        {
+            return;
+        }
+
+        var report = await Agent.StopRecordingAsync();
+        if (Notification == null)
+        {
+            return;
+        }
+
+        if (report.IsSuccessful)
+        {
+            if (string.IsNullOrWhiteSpace(report.NewFileName))
+            {
+                await Notification.RaiseNotification($"The operation has been completed without errors but the video name has not been retrieved.", NotificationLevel.Warning);
+            }
+
+            await Notification.RaiseNotification($"Video file '{report.NewFileName}' has been successfully created.", NotificationLevel.Success);
+        }
+        else
+        {
+            await Notification.RaiseNotification($"The screen capture operation has failed with error: [{report.StatusCode}]", NotificationLevel.Error);
+        }
+    }
+
+    private async Task OnTakeScreenshotButtonClickAsync()
+    {
+        if (Agent == null)
+        {
+            return;
+        }
+
+        var report = await Agent.TakeScreenshotAsync(screenshotOptions);
+        if (Notification == null)
+        {
+            return;
+        }
+
+        if (report.IsSuccessful)
+        {
+            if (string.IsNullOrWhiteSpace(report.NewFileName))
+            {
+                await Notification.RaiseNotification($"The operation has been completed without errors but the screenshot name has not been retrieved.", NotificationLevel.Warning);
+            }
+
+            await Notification.RaiseNotification($"Screenshot file '{report.NewFileName}' has been successfully created.", NotificationLevel.Success);
+        }
+        else
+        {
+            await Notification.RaiseNotification($"The screenshot operation has failed with error: [{report.StatusCode}]", NotificationLevel.Error);
+        }
+    }
+
+    public void Dispose()
+    {
+        if (Agent != null)
+        {
+            Agent.OnStatusChanged -= UpdateAfterChange;
+        }
+    }
+}

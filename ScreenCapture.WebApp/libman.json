@@ -3,9 +3,12 @@
   "defaultProvider": "cdnjs",
   "libraries": [
     {
-      "provider": "cdnjs",
       "library": "bootstrap-icons@1.10.4",
       "destination": "wwwroot/lib/bootstrap-icons/"
+    },
+    {
+      "library": "bootstrap@5.2.3",
+      "destination": "wwwroot/lib/bootstrap/"
     }
   ]
 }
