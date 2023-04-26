@@ -4,7 +4,7 @@ using ScreenCapture.WebApp.Domain;
 
 namespace ScreenCapture.WebApp.Shared;
 
-// TODO notification service
+// TODO options page
 public partial class RemoteAgentCard : IDisposable
 {
     #region Fields
