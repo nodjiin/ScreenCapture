@@ -1,3 +1,4 @@
+using Core.Configurations;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ builder.Services.AddSingleton<IRemoteAgentCommunicationManager, RemoteAgentCommu
 
 builder.Services.AddHttpClient();
 builder.Services.AddOptions<List<RemoteAgentConfiguration>>().Bind(builder.Configuration.GetSection("RemoteAgentsConfigurations")).ValidateDataAnnotations().ValidateOnStart();
+builder.Services.AddOptions<SettingsGroupConfiguration>().Bind(builder.Configuration.GetSection(nameof(SettingsGroupConfiguration))).ValidateDataAnnotations().ValidateOnStart();
 
 var app = builder.Build();
 
