@@ -1,17 +1,40 @@
 ﻿@page "/Settings"
+@using Core.Configurations;
+@using Microsoft.Extensions.Options;
+@inject IOptions<List<SettingsGroupConfiguration>> settingsGroupsOption;
 
 <PageTitle>Settings</PageTitle>
 
+@*TODO settings group displayer*@
+@if(settingsGroups == null || settingsGroups.Count == 0)
+{
+    <text>No configuration setting is currently available.</text>
+}
+else
+{
+    <div class="container mt-4">
+        <div class="form-outline mb-4">
+            <input type="search" id="input-search" class="form-control" placeholder="Search" aria-label="Search" />
+        </div>
 
-Video Recording
+        @foreach(var group in settingsGroups)
+        {
+            <div class="mt-2">
+                <SettingsGroupDisplayer Group="group"/>
+            </div>
+        }
+    </div>
+}
 
-
-Screenshot 
-
-
-confirm / cancel
+@*TODO buttons*@
 
 
 @code {
+    private List<SettingsGroupConfiguration>? settingsGroups;
 
+    protected override void OnInitialized()
+    {
+        settingsGroups = settingsGroupsOption.Value;
+        base.OnInitialized();
+    }
 }

@@ -1,0 +1,26 @@
+﻿@using Core.Configurations;
+
+@if(Group == null)
+{
+    <text>The group has not been configured correctly.</text>
+}
+else
+{
+    <div role="group">
+        <h4>@Group.Name</h4>
+        <hr class="border border-2 border-dark opacity-50" />
+
+        @foreach(var setting in Group.Settings)
+        {
+            <div class="mt-4">
+                <SettingDisplayer Setting="setting"/>
+            </div>
+            <hr />
+        }
+
+    </div>
+}
+
+@code {
+    [Parameter] public SettingsGroupConfiguration? Group { get; set; }
+}
