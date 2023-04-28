@@ -13,7 +13,9 @@ else
         @foreach(var setting in Group.Settings)
         {
             <div class="mt-4">
-                <SettingDisplayer Setting="setting"/>
+                <CascadingValue Value="ChildComponents">
+                    <SettingDisplayer GroupName="@Group.Name" Setting="setting"/>
+                </CascadingValue>
             </div>
             <hr />
         }
@@ -22,5 +24,23 @@ else
 }
 
 @code {
+
+    [CascadingParameter] public Dictionary<string, SettingsGroupDisplayer>? SiblingComponents { get; set; }
     [Parameter] public SettingsGroupConfiguration? Group { get; set; }
+    public Dictionary<string, SettingDisplayer> ChildComponents { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        if (Group == null)
+        {
+            return;
+        }
+
+        if (SiblingComponents != null)
+        {
+            SiblingComponents.Add(Group.Name, this);
+        }
+
+        base.OnInitialized();
+    }
 }

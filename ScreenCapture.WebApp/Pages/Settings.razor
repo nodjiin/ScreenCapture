@@ -5,7 +5,6 @@
 
 <PageTitle>Settings</PageTitle>
 
-@*TODO settings group displayer*@
 @if(settingsGroups == null || settingsGroups.Count == 0)
 {
     <text>No configuration setting is currently available.</text>
@@ -20,21 +19,65 @@ else
         @foreach(var group in settingsGroups)
         {
             <div class="mt-2">
-                <SettingsGroupDisplayer Group="group"/>
+                <CascadingValue Value="childComponents">
+                    <SettingsGroupDisplayer Group="group"/>
+                </CascadingValue>
             </div>
         }
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+            <button class="btn btn-primary me-md-2" type="button" @onclick="OnConfirmButtonClick">Confirm</button>
+            <button class="btn btn-secondary" type="button" @onclick="OnCancelButtonClick">Cancel</button>
+        </div>
     </div>
 }
 
-@*TODO buttons*@
-
-
 @code {
+    [CascadingParameter] public NotificationComponent? Notification { get; set; }
     private List<SettingsGroupConfiguration>? settingsGroups;
+
+    // Each group subscribe to this dictionary, and each setting subscribe to a dictionary contained
+    // in the group parent. In this way I have the complete component tree to manipulate.
+    // I might being stretching the relation between components in this way, maybe passing down a vm item
+    // (even accounting for repeated information) would be a cleaner solution.
+    private Dictionary<string, SettingsGroupDisplayer> childComponents = new();
 
     protected override void OnInitialized()
     {
         settingsGroups = settingsGroupsOption.Value;
         base.OnInitialized();
+    }
+
+    // TODO error/success notification on both button
+    public async Task OnConfirmButtonClick()
+    {
+        foreach(var group in childComponents.Values)
+        {
+            foreach(var setting in group.ChildComponents.Values)
+            {
+                await setting.SaveValueInLocalStorage();
+            }
+        }
+
+        if (Notification != null)
+        {
+            await Notification.RaiseNotification("Settings have been updated", NotificationLevel.Information);
+        }
+    }
+
+    public async Task OnCancelButtonClick()
+    {
+        foreach (var group in childComponents.Values)
+        {
+            foreach (var setting in group.ChildComponents.Values)
+            {
+                await setting.ReloadValueInLocalStorage();
+            }
+        }
+
+        if (Notification != null)
+        {
+            await Notification.RaiseNotification("Settings have been reloaded", NotificationLevel.Information);
+        }
     }
 }

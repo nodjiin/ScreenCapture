@@ -4,5 +4,6 @@ public enum NotificationLevel
 {
     Success,
     Warning,
-    Error
+    Error,
+    Information
 }

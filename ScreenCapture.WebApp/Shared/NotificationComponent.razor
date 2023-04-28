@@ -42,9 +42,11 @@
             case NotificationLevel.Warning:
                 return "bg-warning";
             case NotificationLevel.Error:
-                return "bg-danger";
+                return "bg-danger";            
+            case NotificationLevel.Information:
+                return "bg-info";
             default:
-                return "bg-dark";
+                return "bg-secondary";
         }
     }
 }

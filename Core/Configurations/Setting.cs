@@ -7,7 +7,6 @@ public class Setting
     [Required(AllowEmptyStrings = false)]
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string Value { get; set; } = string.Empty;
 
     [Required(AllowEmptyStrings = false, ErrorMessage = "Any setting must have a well defined default value.")]
     public string DefaultValue { get; set; } = string.Empty;
