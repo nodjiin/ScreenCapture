@@ -1,0 +1,36 @@
+﻿<div class="form-check form-switch">
+    <input class="form-check-input" type="checkbox" role="switch" @oninput="CheckboxChanged" checked="@isChecked">
+</div>
+
+@code {
+    [Parameter] public string Toggled { get; set; } = "false";
+    [Parameter] public EventCallback<string> OnToggled { get; set; }
+    private bool isChecked;
+
+    protected override void OnParametersSet()
+    {
+        try
+        {
+            isChecked = Convert.ToBoolean(Toggled.Trim());
+        }
+        catch (Exception)
+        {
+            // TODO notification? log?
+        }
+
+        base.OnInitialized();
+    }
+
+    private void CheckboxChanged(ChangeEventArgs e)
+    {
+        try
+        {
+            Toggled = Convert.ToBoolean(e.Value) ? "true" : "false";
+            OnToggled.InvokeAsync(Toggled);
+        }
+        catch (Exception)
+        {
+            // TODO notification? log?
+        }
+    }
+}

@@ -14,18 +14,25 @@ else
                 <strong>@Setting.Name</strong>  
             </div>
             <div class="col-auto">
-                @if(Setting.PossibleValues != null)
+                @switch (Setting.Type)
                 {
-                    <select class="form-select shadow-none" @bind="Value">
-                        @foreach(var possibleValue in Setting.PossibleValues)
-                        {
-                            <option value="@possibleValue">@possibleValue</option>
-                        }
-                    </select>    
-                }
-                else
-                {
-                    <input type="text" class="form-control shadow-none" @bind-value="Value">
+                    case SettingType.Open:
+                        <input type="text" class="form-control shadow-none" @bind-value="Value">
+                        break;
+                    case SettingType.Fixed:
+                        <select class="form-select shadow-none" @bind="Value">
+                            @foreach (var possibleValue in Setting.PossibleValues ?? Enumerable.Empty<string>())
+                            {
+                                <option value="@possibleValue">@possibleValue</option>
+                            }
+                        </select>
+                        break;
+                    case SettingType.Boolean:
+                    <ToggableSwitch Toggled="@Value" OnToggled="UpdateValue"/>
+                        break;
+                    default:
+                        <i class="bi bi-bug-fill fs-2"></i>
+                        break;
                 }
             </div>
         </div>
@@ -135,5 +142,10 @@ else
                 await Notification.RaiseNotification($"Failed retrieve locally stored value of setting: {storageValueName}", NotificationLevel.Error);
             }
         }
+    }
+
+    private void UpdateValue(string value)
+    {
+        Value = value;
     }
 }

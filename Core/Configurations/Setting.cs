@@ -24,5 +24,10 @@ public enum SettingType
     /// <summary>
     /// Define a setting with a fixed amount of possible values, e.g. where the user has to choose a value from within PossibleValues
     /// </summary>
-    Fixed
+    Fixed,
+
+    /// <summary>
+    /// Define a setting with only 2 possible values: true or false. 
+    /// </summary>
+    Boolean
 }
