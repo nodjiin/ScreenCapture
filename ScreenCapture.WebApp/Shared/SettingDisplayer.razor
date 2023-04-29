@@ -8,7 +8,7 @@
 }
 else
 {
-    <div>
+    <div class="mt-4 @(isCollapsed ? "d-none" : string.Empty)">
         <div class="row">
             <div class="col">
                 <strong>@Setting.Name</strong>  
@@ -40,15 +40,18 @@ else
             <p>@Setting.Description</p>
         </div>
     </div>
+    <hr class="@(isCollapsed ? "d-none" : string.Empty)" />
 }
 
 @code {
     [CascadingParameter] public NotificationComponent? Notification { get; set; }
     [CascadingParameter]
-    public Dictionary<string, SettingDisplayer>? SiblingComponents { get; set; }
+    public List<SettingDisplayer>? SiblingComponents { get; set; }
     [Parameter] public Setting? Setting { get; set; }
     [Parameter] public string Value { get; set; } = string.Empty;
     [Parameter] public string GroupName { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    private bool isCollapsed;
     private string storageValueName = string.Empty;
 
     protected override void OnInitialized()
@@ -58,12 +61,13 @@ else
             return;
         }
 
+        Name = Setting.Name;
         storageValueName = $"{GroupName}:{Setting.Name}";
         Value = Setting.DefaultValue;
 
         if(SiblingComponents != null)
         {
-            SiblingComponents.Add(Setting.Name, this);
+            SiblingComponents.Add(this);
         }
 
         base.OnInitialized();
@@ -142,6 +146,16 @@ else
                 await Notification.RaiseNotification($"Failed retrieve locally stored value of setting: {storageValueName}", NotificationLevel.Error);
             }
         }
+    }
+
+    public void Hide()
+    {
+        isCollapsed = true;
+    }
+
+    public void Show()
+    {
+        isCollapsed = false;
     }
 
     private void UpdateValue(string value)

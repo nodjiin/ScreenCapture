@@ -13,7 +13,7 @@ else
 {
     <div class="container mt-4">
         <div class="form-outline mb-4">
-            <input type="search" id="input-search" class="form-control" placeholder="Search" aria-label="Search" />
+            <input type="search" id="input-search" class="form-control" placeholder="Search" aria-label="Search" @oninput="FilterSettings"/>
         </div>
 
         @foreach(var group in settingsGroups)
@@ -36,11 +36,11 @@ else
     [CascadingParameter] public NotificationComponent? Notification { get; set; }
     private List<SettingsGroupConfiguration>? settingsGroups;
 
-    // Each group subscribe to this dictionary, and each setting subscribe to a dictionary contained
+    // Each group subscribe to this list, and each setting subscribe to a list contained
     // in the group parent. In this way I have the complete component tree to manipulate.
     // I might being stretching the relation between components in this way, maybe passing down a vm item
     // (even accounting for repeated information) would be a cleaner solution.
-    private Dictionary<string, SettingsGroupDisplayer> childComponents = new();
+    private List<SettingsGroupDisplayer> childComponents = new();
 
     protected override void OnInitialized()
     {
@@ -50,12 +50,9 @@ else
 
     public async Task OnConfirmButtonClick()
     {
-        foreach(var group in childComponents.Values)
+        foreach (var setting in childComponents.SelectMany(group => group.ChildComponents))
         {
-            foreach(var setting in group.ChildComponents.Values)
-            {
-                await setting.SaveValueInLocalStorage();
-            }
+            await setting.SaveValueInLocalStorage();
         }
 
         if (Notification != null)
@@ -66,17 +63,40 @@ else
 
     public async Task OnCancelButtonClick()
     {
-        foreach (var group in childComponents.Values)
+        foreach (var setting in childComponents.SelectMany(group => group.ChildComponents))
         {
-            foreach (var setting in group.ChildComponents.Values)
-            {
-                await setting.ReloadValueInLocalStorage();
-            }
+            await setting.ReloadValueInLocalStorage();
         }
 
         if (Notification != null)
         {
             await Notification.RaiseNotification("Settings have been reloaded", NotificationLevel.Information);
+        }
+    }
+
+    // TODO very basic search functionality lacking highlight, search in the description and so on. Improve one day.
+    public void FilterSettings(ChangeEventArgs e)
+    {
+        var searchString = Convert.ToString(e?.Value);
+        if (string.IsNullOrEmpty(searchString) || searchString.Length < 3)
+        {
+            foreach(var setting in childComponents.SelectMany(group => group.ChildComponents).Where(s => s != null))
+            {
+                setting.Show();
+            }
+            return;
+        }
+
+        foreach (var setting in childComponents.SelectMany(group => group.ChildComponents).Where(s => s != null))
+        {
+            if (setting.Name.ToLower().Contains(searchString.ToLower()))
+            {
+                setting.Show();
+            }
+            else
+            {
+                setting.Hide();
+            }
         }
     }
 }
