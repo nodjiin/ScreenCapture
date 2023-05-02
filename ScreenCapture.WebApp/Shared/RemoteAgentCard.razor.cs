@@ -51,7 +51,7 @@ public partial class RemoteAgentCard : IDisposable
             case (RemoteAgentStatus.Error): // yellow since red is already used to identify active recording
                 return "text-warning";
             case (RemoteAgentStatus.Recording):
-                return "text-danger";
+                return "text-danger recording";
             case (RemoteAgentStatus.Offline):
             default:
                 return "text-dark";
