@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Core.Dtos;
+using Microsoft.AspNetCore.Components;
 using ScreenCapture.WebApp.Domain;
 using ScreenCapture.WebApp.Services.Interfaces;
 
@@ -8,7 +9,7 @@ namespace ScreenCapture.WebApp.Shared;
 public partial class RemoteAgentCard : IDisposable
 {
     #region Parameters
-    [Inject] public IDtoFactory Factory { get; set; }
+    [Inject] public IDtoFactory? Factory { get; set; }
     [Parameter] public IRemoteAgent? Agent { get; set; }
     [CascadingParameter] public NotificationComponent? Notification { get; set; }
     #endregion
@@ -61,12 +62,12 @@ public partial class RemoteAgentCard : IDisposable
     #region ButtonEventHandlers
     private async Task OnStartRecordingButtonClickAsync()
     {
-        if (Agent == null)
+        if (Agent == null || Factory == null)
         {
             return;
         }
 
-        var dto = await Factory.CreateRecordingOptionsAsync();
+        var dto = await Factory.CreateSettingDtoAsync<RecordingOptions>();
         var report = await Agent.StartRecordingAsync(dto);
         if (Notification == null)
         {
@@ -109,12 +110,12 @@ public partial class RemoteAgentCard : IDisposable
 
     private async Task OnTakeScreenshotButtonClickAsync()
     {
-        if (Agent == null)
+        if (Agent == null || Factory == null)
         {
             return;
         }
 
-        var dto = await Factory.CreateScreenshotOptionsAsync();
+        var dto = await Factory.CreateSettingDtoAsync<ScreenshotOptions>();
         var report = await Agent.TakeScreenshotAsync(dto);
         if (Notification == null)
         {

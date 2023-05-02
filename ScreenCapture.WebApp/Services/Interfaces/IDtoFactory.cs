@@ -1,9 +1,6 @@
-﻿using Core.Dtos;
-
-namespace ScreenCapture.WebApp.Services.Interfaces;
+﻿namespace ScreenCapture.WebApp.Services.Interfaces;
 
 public interface IDtoFactory
 {
-    public Task<RecordingOptions> CreateRecordingOptionsAsync();
-    public Task<ScreenshotOptions> CreateScreenshotOptionsAsync();
+    public Task<TDto> CreateSettingDtoAsync<TDto>() where TDto : new();
 }

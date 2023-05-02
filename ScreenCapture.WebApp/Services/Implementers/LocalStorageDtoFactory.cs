@@ -1,6 +1,5 @@
 ﻿using Core.Attributes;
 using Core.Configurations;
-using Core.Dtos;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using ScreenCapture.WebApp.Services.Interfaces;
@@ -19,25 +18,23 @@ namespace ScreenCapture.WebApp.Services.Implementers
             _defaultConfiguratios = options.Value;
         }
 
-        public Task<RecordingOptions> CreateRecordingOptionsAsync()
+        public async Task<TDto> CreateSettingDtoAsync<TDto>() where TDto : new()
         {
-            throw new NotImplementedException();
-        }
-
-        public async Task<ScreenshotOptions> CreateScreenshotOptionsAsync()
-        {
-            Type type = typeof(ScreenshotOptions);
-            var dto = new ScreenshotOptions();
-            dto.ImageFormat = await GetSettingValue(type, nameof(dto.ImageFormat));
+            Type type = typeof(TDto);
+            TDto dto = new();
+            foreach (var property in type.GetProperties())
+            {
+                property.SetValue(dto, await GetSettingValue(type, property));
+            }
             return dto;
         }
 
-        private async Task<string> GetSettingValue(Type type, string propertyName)
+        private async Task<string> GetSettingValue(Type type, PropertyInfo property)
         {
-            var attribute = type.GetProperty(propertyName)!.GetCustomAttribute<SettingKeyAttribute>(false);
+            var attribute = property!.GetCustomAttribute<SettingKeyAttribute>(false);
             if (attribute == null || string.IsNullOrWhiteSpace(attribute.KeyName))
             {
-                throw new InvalidOperationException($"The property {propertyName} of the setting related class {type.Name} has not been flagged with a key attribute.");
+                throw new InvalidOperationException($"The property {property.Name} of the setting related class {type.Name} has not been flagged with a key attribute.");
             }
 
             var propertyKey = attribute.KeyName;
