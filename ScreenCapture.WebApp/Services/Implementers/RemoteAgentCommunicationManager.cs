@@ -7,7 +7,7 @@ using Core.Helpers;
 namespace ScreenCapture.WebApp.Services.Implementers;
 public class RemoteAgentCommunicationManager : IRemoteAgentCommunicationManager
 {
-    private static readonly string _startRecordingEndpointTemplate = "https://<ip:port>/Capture/StartRecoding";
+    private static readonly string _startRecordingEndpointTemplate = "https://<ip:port>/Capture/StartRecording";
     private static readonly string _stopRecordingEndpointTemplate = "https://<ip:port>/Capture/StopRecording";
     private static readonly string _takeSnapshotEndpointTemplate = "https://<ip:port>/Capture/TakeSnapshot";
     private static readonly string _getStatusEndpointTemplate = "https://<ip:port>/Status/GetStatus";

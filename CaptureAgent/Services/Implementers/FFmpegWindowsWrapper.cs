@@ -59,7 +59,7 @@ public class FFmpegWindowsWrapper : IVideoRecorder
 
         if (!string.IsNullOrWhiteSpace(options.ShowRegion))
         {
-            bool value = Convert.ToBoolean(options.DrawMouse);
+            bool value = Convert.ToBoolean(options.ShowRegion);
             @string.Append(" -show_region ");
             @string.Append(value ? "1" : "0");
         }
