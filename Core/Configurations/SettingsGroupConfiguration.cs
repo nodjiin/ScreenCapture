@@ -7,6 +7,5 @@ public class SettingsGroupConfiguration
     [Required(AllowEmptyStrings = false)]
     public string Name { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "A settings group must contain at least a configured setting.")]
-    public List<Setting> Settings { get; set; } = new List<Setting>();
+    public Dictionary<string, Setting> Settings { get; set; } = new Dictionary<string, Setting>();
 }

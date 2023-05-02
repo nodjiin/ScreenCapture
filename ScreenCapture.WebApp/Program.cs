@@ -22,10 +22,10 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddSingleton<IRemoteAgentsMonitor, RemoteAgentsMonitor>();
 builder.Services.AddSingleton<IRemoteAgentCommunicationManager, RemoteAgentCommunicationManager>();
-
+builder.Services.AddScoped<IDtoFactory, LocalStorageDtoFactory>();
 builder.Services.AddHttpClient();
 builder.Services.AddOptions<List<RemoteAgentConfiguration>>().Bind(builder.Configuration.GetSection("RemoteAgentsConfigurations")).ValidateDataAnnotations().ValidateOnStart();
-builder.Services.AddOptions<List<SettingsGroupConfiguration>>().Bind(builder.Configuration.GetSection("SettingsGroupsConfiguration")).ValidateDataAnnotations().ValidateOnStart();
+builder.Services.AddOptions<Dictionary<string, SettingsGroupConfiguration>>().Bind(builder.Configuration.GetSection("SettingsGroupsConfiguration")).ValidateDataAnnotations().ValidateOnStart();
 
 var app = builder.Build();
 

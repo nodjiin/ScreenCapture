@@ -6,6 +6,8 @@ public class Setting
 {
     [Required(AllowEmptyStrings = false)]
     public string Name { get; set; } = string.Empty;
+    [Required(AllowEmptyStrings = false)]
+    public string Key { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string DefaultValue { get; set; } = string.Empty;
     public string[]? PossibleValues { get; set; }

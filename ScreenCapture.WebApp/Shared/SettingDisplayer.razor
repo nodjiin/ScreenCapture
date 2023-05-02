@@ -49,10 +49,9 @@ else
     public List<SettingDisplayer>? SiblingComponents { get; set; }
     [Parameter] public Setting? Setting { get; set; }
     [Parameter] public string Value { get; set; } = string.Empty;
-    [Parameter] public string GroupName { get; set; } = string.Empty;
+    [Parameter] public string Key { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     private bool isCollapsed;
-    private string storageValueName = string.Empty;
 
     protected override void OnInitialized()
     {
@@ -62,7 +61,6 @@ else
         }
 
         Name = Setting.Name;
-        storageValueName = $"{GroupName}:{Setting.Name}";
         Value = Setting.DefaultValue;
 
         if(SiblingComponents != null)
@@ -84,7 +82,7 @@ else
         {
             try
             {
-                var savedValue = await storage.GetAsync<string>(storageValueName);
+                var savedValue = await storage.GetAsync<string>(Key);
                 if (savedValue.Success && savedValue.Value != null)
                 {
                     this.Value = savedValue.Value;
@@ -92,14 +90,14 @@ else
                 }
                 else
                 {
-                    await storage.SetAsync(storageValueName, Value);
+                    await storage.SetAsync(Key, Value);
                 }
             }
             catch(Exception)
             {
                 if(Notification != null)
                 {
-                    await Notification.RaiseNotification($"Failed save/load locally stored value of setting: {storageValueName}", NotificationLevel.Warning);
+                    await Notification.RaiseNotification($"Failed save/load locally stored value of setting: {Key}", NotificationLevel.Warning);
                 }
             }
         }
@@ -111,13 +109,13 @@ else
     {
         try
         {
-            await storage.SetAsync(storageValueName, Value);
+            await storage.SetAsync(Key, Value);
         }
         catch (Exception)
         {
             if (Notification != null)
             {
-                await Notification.RaiseNotification($"Failed save locally the value of setting: {storageValueName}", NotificationLevel.Error);
+                await Notification.RaiseNotification($"Failed save locally the value of setting: {Key}", NotificationLevel.Error);
             }
         }
     }
@@ -126,7 +124,7 @@ else
     {
         try 
         {
-            var savedValue = await storage.GetAsync<string>(storageValueName);
+            var savedValue = await storage.GetAsync<string>(Key);
             if (savedValue.Success && savedValue.Value != null)
             {
                 this.Value = savedValue.Value;
@@ -135,7 +133,7 @@ else
             {
                 if (Notification != null)
                 {
-                    await Notification.RaiseNotification($"Failed retrieve locally stored value of setting: {storageValueName}", NotificationLevel.Error);
+                    await Notification.RaiseNotification($"Failed retrieve locally stored value of setting: {Key}", NotificationLevel.Error);
                 }
             }
         }
@@ -143,7 +141,7 @@ else
         {
             if (Notification != null)
             {
-                await Notification.RaiseNotification($"Failed retrieve locally stored value of setting: {storageValueName}", NotificationLevel.Error);
+                await Notification.RaiseNotification($"Failed retrieve locally stored value of setting: {Key}", NotificationLevel.Error);
             }
         }
     }

@@ -1,7 +1,7 @@
 ﻿@page "/Settings"
 @using Core.Configurations;
 @using Microsoft.Extensions.Options;
-@inject IOptions<List<SettingsGroupConfiguration>> settingsGroupsOption;
+@inject IOptions<Dictionary<string, SettingsGroupConfiguration>> settingsGroupsOption;
 
 <PageTitle>Settings</PageTitle>
 
@@ -44,7 +44,7 @@ else
 
     protected override void OnInitialized()
     {
-        settingsGroups = settingsGroupsOption.Value;
+        settingsGroups = settingsGroupsOption.Value.Values.ToList();
         base.OnInitialized();
     }
 

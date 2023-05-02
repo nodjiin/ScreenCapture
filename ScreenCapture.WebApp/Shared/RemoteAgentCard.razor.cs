@@ -1,18 +1,14 @@
-﻿using Core.Dtos;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using ScreenCapture.WebApp.Domain;
+using ScreenCapture.WebApp.Services.Interfaces;
 
 namespace ScreenCapture.WebApp.Shared;
 
 // TODO options page
 public partial class RemoteAgentCard : IDisposable
 {
-    #region Fields
-    private readonly ScreenshotOptions screenshotOptions = new ScreenshotOptions();
-    private readonly RecordingOptions recordingOptions = new RecordingOptions();
-    #endregion
-
     #region Parameters
+    [Inject] public IDtoFactory Factory { get; set; }
     [Parameter] public IRemoteAgent? Agent { get; set; }
     [CascadingParameter] public NotificationComponent? Notification { get; set; }
     #endregion
@@ -70,7 +66,8 @@ public partial class RemoteAgentCard : IDisposable
             return;
         }
 
-        var report = await Agent.StartRecordingAsync(recordingOptions);
+        var dto = await Factory.CreateRecordingOptionsAsync();
+        var report = await Agent.StartRecordingAsync(dto);
         if (Notification == null)
         {
             return;
@@ -117,7 +114,8 @@ public partial class RemoteAgentCard : IDisposable
             return;
         }
 
-        var report = await Agent.TakeScreenshotAsync(screenshotOptions);
+        var dto = await Factory.CreateScreenshotOptionsAsync();
+        var report = await Agent.TakeScreenshotAsync(dto);
         if (Notification == null)
         {
             return;

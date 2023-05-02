@@ -13,7 +13,7 @@ else
         @foreach(var setting in Group.Settings)
         {
             <CascadingValue Value="ChildComponents">
-                <SettingDisplayer GroupName="@Group.Name" Setting="setting"/>
+                <SettingDisplayer Key="@setting.Key" Setting="setting.Value"/>
             </CascadingValue>
         }
 
