@@ -46,8 +46,9 @@ public class FFmpegWindowsWrapper : IVideoRecorder
 
         if (!string.IsNullOrWhiteSpace(options.DrawMouse))
         {
+            bool value = Convert.ToBoolean(options.DrawMouse);
             @string.Append(" -draw_mouse ");
-            @string.Append(options.DrawMouse);
+            @string.Append(value ? "1" : "0");
         }
 
         if (!string.IsNullOrWhiteSpace(options.FrameRate))
@@ -58,8 +59,9 @@ public class FFmpegWindowsWrapper : IVideoRecorder
 
         if (!string.IsNullOrWhiteSpace(options.ShowRegion))
         {
+            bool value = Convert.ToBoolean(options.DrawMouse);
             @string.Append(" -show_region ");
-            @string.Append(options.ShowRegion);
+            @string.Append(value ? "1" : "0");
         }
 
         if (!string.IsNullOrWhiteSpace(options.VideoSize))
