@@ -23,9 +23,11 @@ builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuth
 builder.Services.AddSingleton<IRemoteAgentsMonitor, RemoteAgentsMonitor>();
 builder.Services.AddSingleton<IRemoteAgentCommunicationManager, RemoteAgentCommunicationManager>();
 builder.Services.AddScoped<IDtoFactory, LocalStorageDtoFactory>();
+builder.Services.AddScoped<IMediaExplorer, LocalDiskMediaExplorer>();
 builder.Services.AddHttpClient();
 builder.Services.AddOptions<List<RemoteAgentConfiguration>>().Bind(builder.Configuration.GetSection("RemoteAgentsConfigurations")).ValidateDataAnnotations().ValidateOnStart();
 builder.Services.AddOptions<Dictionary<string, SettingsGroupConfiguration>>().Bind(builder.Configuration.GetSection("SettingsGroupsConfiguration")).ValidateDataAnnotations().ValidateOnStart();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -42,9 +44,7 @@ else
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.UseAuthorization();
