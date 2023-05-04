@@ -1,0 +1,11 @@
+﻿<div class="card" style="width: 18rem;">
+    <i class="card-img-top bi bi-bug-fill fs-1"></i>
+    <div class="card-body">
+        <h5 class="card-title text-danger">Error</h5>
+        <p class="card-text">@ErrorText</p>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string ErrorText { get; set; } = string.Empty;
+}

@@ -3,13 +3,7 @@
 
 @if(Agent == null)
 {
-    <div class="card" style="width: 18rem;">
-        <i class="card-img-top bi bi-bug-fill fs-1"></i>
-        <div class="card-body">
-            <h5 class="card-title text-danger">Error</h5>
-            <p class="card-text">The agent has not been loaded correctly</p>
-        </div>
-    </div>
+    <ErrorCard ErrorText="The agent has not been loaded correctly" />
 }
 else
 {

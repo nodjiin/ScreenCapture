@@ -1,0 +1,49 @@
+﻿@page "/Gallery/Screenshot"
+
+@using ScreenCapture.WebApp.Services.Interfaces;
+@inject IMediaExplorer explorer
+
+<PageTitle>Screenshots Gallery</PageTitle>
+
+@*@foreach(var screenshot in screenshots)
+{
+    <div>
+        <img src="/media/screenshot/@screenshot" alt="@screenshot"/>
+    </div>
+}*@
+
+<CollectionGridDisplayer Collection="mediaInfoCollection">
+    <EmptyCollectionTemplate>
+        <text>No screenshot has been found.</text>
+    </EmptyCollectionTemplate>
+    <CollectionItemTemplate>
+        <ImageDisplayer Info="@context" />
+    </CollectionItemTemplate>
+</CollectionGridDisplayer>
+
+@code {
+    private const int pagesize = 16;
+    private int page;
+    private List<MediaInfo> mediaInfoCollection = new List<MediaInfo>();
+
+    protected override async Task OnAfterRenderAsync(bool first)
+    {
+        if (first)
+        {
+            page = 0;
+            var screenshots = await explorer.FindStoredScreenshots();
+
+            for (int i = page; i < pagesize * (page + 1); i++)
+            {
+                var info = await explorer.GetScreenshotInformation(screenshots[i]);
+                if(info != null)
+                {
+                    mediaInfoCollection.Add(info);
+                }
+            }
+        }
+        
+        
+        StateHasChanged();
+    }
+}

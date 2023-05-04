@@ -19,6 +19,7 @@ main {
     height: 3.5rem;
     display: flex;
     align-items: center;
+    background-color: #F0F0F0;
 }
 
     .top-row ::deep a, .top-row .btn-link {

@@ -1,0 +1,23 @@
+﻿@if(Info == null)
+{
+    <ErrorCard ErrorText="The screenshot has not been loaded correctly" />
+}
+else
+{
+    <div class="card" style="width: 18rem;">
+        <img class="card-img-top" src="/media/screenshot/@Info.Name" alt="@Info.Name">
+        <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-body-secondary">@Info.Name</h6>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item"><strong>Source Machine:</strong> @Info.SourceMachine</li>
+            <li class="list-group-item"><strong>Size:</strong> @Info.Size</li>
+        </ul>
+    </div>
+}
+
+
+
+@code {
+    [Parameter] public MediaInfo? Info { get; set; }
+}

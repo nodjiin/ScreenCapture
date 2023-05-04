@@ -58,6 +58,12 @@ else
         base.OnInitialized();
     }
 
+    protected override void OnAfterRender(bool first)
+    {
+        CalculateGridDimension();
+        base.OnAfterRender(first);
+    }
+
     private void CalculateGridDimension()
     {
         if (Collection == null || Collection.Count == 0)

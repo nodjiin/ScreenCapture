@@ -85,6 +85,7 @@ public class LocalDiskMediaExplorer : IMediaExplorer
 
         return new MediaInfo()
         {
+            Name = fileInfo.Name,
             Path = fileInfo.FullName,
             Extension = fileInfo.Extension
         };
