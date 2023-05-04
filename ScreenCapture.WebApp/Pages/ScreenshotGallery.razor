@@ -5,13 +5,6 @@
 
 <PageTitle>Screenshots Gallery</PageTitle>
 
-@*@foreach(var screenshot in screenshots)
-{
-    <div>
-        <img src="/media/screenshot/@screenshot" alt="@screenshot"/>
-    </div>
-}*@
-
 <CollectionGridDisplayer Collection="mediaInfoCollection">
     <EmptyCollectionTemplate>
         <text>No screenshot has been found.</text>
@@ -21,28 +14,38 @@
     </CollectionItemTemplate>
 </CollectionGridDisplayer>
 
+<PageNavigationBar OnPageItemClick="ChangePage" PageCount="@pageCount" />
+
 @code {
     private const int pagesize = 16;
-    private int page;
     private List<MediaInfo> mediaInfoCollection = new List<MediaInfo>();
+    private int pageCount = 1;
 
     protected override async Task OnAfterRenderAsync(bool first)
     {
         if (first)
         {
-            page = 0;
-            var screenshots = await explorer.FindStoredScreenshots();
+            await ChangePage(0);
+        }
 
-            for (int i = page; i < pagesize * (page + 1); i++)
+        // this duplicate StateHasChanged seems necessary for some reason... TODO investigate
+        StateHasChanged();
+    }
+
+    private async Task ChangePage(int pageNumber)
+    {
+        mediaInfoCollection.Clear();
+        var screenshots = await explorer.FindStoredScreenshots();
+        pageCount = screenshots.Length;
+
+        for (int i = pageNumber; i < pagesize * (pageNumber + 1) && i < screenshots.Length; i++)
+        {
+            var info = await explorer.GetScreenshotInformation(screenshots[i]);
+            if (info != null)
             {
-                var info = await explorer.GetScreenshotInformation(screenshots[i]);
-                if(info != null)
-                {
-                    mediaInfoCollection.Add(info);
-                }
+                mediaInfoCollection.Add(info);
             }
         }
-        
         
         StateHasChanged();
     }

@@ -1,0 +1,128 @@
+﻿<div class="mt-4 text-end">
+<hr />
+<nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-end">
+            <li class="page-item" disabled="(!@pageItemEnabled[0])">
+                <a class="page-link" @onclick="@(() => RaisePageItemClickEvent(pageItemNumbers[0]))" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+            <li class="page-item" disabled="@(!pageItemEnabled[1])"><a class="page-link" @onclick="@(() => RaisePageItemClickEvent(pageItemNumbers[1]))">1</a></li>
+            <li class="page-item" disabled="@(!pageItemEnabled[2])"><a class="page-link" @onclick="@(() => RaisePageItemClickEvent(pageItemNumbers[2]))">2</a></li>
+            <li class="page-item" disabled="@(!pageItemEnabled[3])"><a class="page-link" @onclick="@(() => RaisePageItemClickEvent(pageItemNumbers[3]))">3</a></li>
+            <li class="page-item" disabled="@(!pageItemEnabled[4])">
+                <a class="page-link" @onclick="@(() => RaisePageItemClickEvent(pageItemNumbers[4]))" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
+</div>
+
+@code {
+    [Parameter] public EventCallback<int> OnPageItemClick { get; set; }
+    [Parameter] public int PageCount { get; set; }
+    private int currentPage;
+    private int[] pageItemNumbers = new int[5];
+    private bool[] pageItemEnabled = new bool[5];
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(firstRender)
+        {
+            currentPage = 1;
+            MoveNavigationOnFirstPageItem();
+        }
+
+        base.OnAfterRender(firstRender);
+    }
+
+    private async Task RaisePageItemClickEvent(int pageNumber)
+    {
+        await OnPageItemClick.InvokeAsync(pageNumber);
+        ChangeCurrentPageVisualization(pageNumber);
+    }
+
+    private void ChangeCurrentPageVisualization(int pageNumber)
+    {
+        // TODO set active, check why disabled is not working 
+
+        currentPage = pageNumber;
+
+        if (currentPage == 1)
+        {
+            MoveNavigationOnFirstPageItem();
+        }
+        else if (currentPage < PageCount)
+        {
+            MoveNavigationOnMiddlePageItem();
+        }
+        else
+        {
+            MoveNavigationOnLastPageItem();
+        }
+    }
+
+    private void MoveNavigationOnFirstPageItem()
+    {
+        for (int i = 1; i < 4; i++)
+        {
+            pageItemNumbers[i] = i;
+        }
+        pageItemNumbers[4] = 1;
+
+        switch (PageCount)
+        {
+            case 1:
+                pageItemEnabled[1] = true;
+                pageItemEnabled[0] = pageItemEnabled[2] = pageItemEnabled[3] = pageItemEnabled[4] = false;
+                break;
+            case 2:
+                pageItemEnabled[1] = pageItemEnabled[2] = pageItemEnabled[4] = true;
+                pageItemEnabled[0] = pageItemEnabled[3] = false;
+                break;
+            case > 2:
+                pageItemEnabled[0] = false;
+                pageItemEnabled[1] = pageItemEnabled[2] = pageItemEnabled[3] = pageItemEnabled[4] = true;
+                break;
+            case 0:
+            default:
+                break;
+        }
+    }
+
+    private void MoveNavigationOnMiddlePageItem()
+    {
+        pageItemNumbers[0] = pageItemNumbers[1] = currentPage - 1;
+        pageItemNumbers[2] = currentPage;
+        pageItemNumbers[3] = pageItemNumbers[4] = currentPage + 1;
+        pageItemEnabled[0] = pageItemEnabled[1] = pageItemEnabled[2] = pageItemEnabled[3] = pageItemEnabled[4] = true;
+    }
+
+    private void MoveNavigationOnLastPageItem()
+    {
+        switch (PageCount)
+        {
+            case 2:
+                pageItemNumbers[0] = pageItemNumbers[1] = currentPage - 1;
+                pageItemNumbers[2] = currentPage;
+                pageItemNumbers[3] = currentPage + 1;
+                pageItemEnabled[0] = pageItemEnabled[1] = pageItemEnabled[2] = true;
+                pageItemEnabled[3] = pageItemEnabled[4] = false;
+                break;
+            case > 2:
+                pageItemNumbers[0] = pageItemNumbers[2] = currentPage - 1;
+                pageItemNumbers[1] = currentPage - 2;
+                pageItemNumbers[3] = currentPage;
+                pageItemEnabled[0] = pageItemEnabled[1] = pageItemEnabled[2] = pageItemEnabled[3] = true;
+                pageItemEnabled[4] = false;
+                break;
+            case 1: // 1 is a theoretical error state in this scenario, so we try to fallback to a previous page
+                ChangeCurrentPageVisualization(currentPage - 1);
+                break;
+            case 0:
+            default:
+                break;
+        }
+    }
+}
