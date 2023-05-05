@@ -30,7 +30,7 @@ public class FileTransferService : IFileTransferService
         _client.ValidateCertificate += (c, e) => e.Accept = true;
     }
 
-    public async Task SendFileAsync(string filePath, bool deleteLocalFile = true)
+    public async Task SendFileAsync(string filePath, string remotePath, bool deleteLocalFile = true)
     {
         if (!File.Exists(filePath))
         {
@@ -38,7 +38,7 @@ public class FileTransferService : IFileTransferService
         }
 
         await _client.Connect().ConfigureAwait(false);
-        await _client.UploadFile(filePath, Path.GetFileName(filePath)).ConfigureAwait(false);
+        await _client.UploadFile(filePath, Path.Combine(remotePath, Path.GetFileName(filePath)), createRemoteDir: true).ConfigureAwait(false);
         await _client.Disconnect().ConfigureAwait(false);
 
         if (deleteLocalFile)

@@ -15,7 +15,7 @@ public class ScreenshotService : IScreenshotService
     public ScreenshotService(IOptions<ScreenshotServiceConfiguration> config, IScreenSnapper screenSnapper, IFileTransferService transferService)
     {
         _config = config.Value;
-        _fullPath = Path.GetFullPath(_config.SavePath);
+        _fullPath = Path.GetFullPath(_config.LocalSavePath);
         _snapper = screenSnapper;
         _transferService = transferService;
     }
@@ -34,7 +34,7 @@ public class ScreenshotService : IScreenshotService
             _semaphore.Release();
         }
 
-        await _transferService.SendFileAsync(Path.Combine(_fullPath, snapshotName));
+        await _transferService.SendFileAsync(Path.Combine(_fullPath, snapshotName), _config.RemoteSavePath).ConfigureAwait(false);
         return snapshotName;
     }
 }

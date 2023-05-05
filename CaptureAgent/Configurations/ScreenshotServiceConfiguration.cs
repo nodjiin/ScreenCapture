@@ -1,6 +1,11 @@
-﻿namespace CaptureAgent.Configurations;
+﻿using System.ComponentModel;
+
+namespace CaptureAgent.Configurations;
 public class ScreenshotServiceConfiguration
 {
     [ValidPath]
-    public string SavePath { get; set; } = string.Empty;
+    public string LocalSavePath { get; set; } = string.Empty;
+
+    [DefaultValue("screenshots")]
+    public string RemoteSavePath { get; set; } = string.Empty;
 }

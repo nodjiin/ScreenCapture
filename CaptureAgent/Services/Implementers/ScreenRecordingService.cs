@@ -9,13 +9,15 @@ public class ScreenRecordingService : IScreenRecordingService
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private readonly ScreenRecordingServiceConfiguration _config;
     private readonly string _fullPath;
+    private readonly string _remoteSavePath;
     private readonly IVideoRecorder _recorder;
     private readonly IFileTransferService _transferService;
 
     public ScreenRecordingService(IOptions<ScreenRecordingServiceConfiguration> config, IVideoRecorder recorder, IFileTransferService transferService)
     {
         _config = config.Value;
-        _fullPath = Path.GetFullPath(_config.SavePath);
+        _fullPath = Path.GetFullPath(_config.LocalSavePath);
+        _remoteSavePath = _config.RemoteSavePath;
         _recorder = recorder;
         _transferService = transferService;
     }
@@ -69,7 +71,7 @@ public class ScreenRecordingService : IScreenRecordingService
             _semaphore.Release();
         }
 
-        await _transferService.SendFileAsync(Path.Combine(_fullPath, recordedVideo)).ConfigureAwait(false);
+        await _transferService.SendFileAsync(Path.Combine(_fullPath, recordedVideo), _remoteSavePath).ConfigureAwait(false);
         return recordedVideo;
     }
 }

@@ -1,8 +1,13 @@
-﻿namespace CaptureAgent.Configurations
+﻿using System.ComponentModel;
+
+namespace CaptureAgent.Configurations
 {
     public class ScreenRecordingServiceConfiguration
     {
         [ValidPath]
-        public string SavePath { get; set; } = string.Empty;
+        public string LocalSavePath { get; set; } = string.Empty;
+
+        [DefaultValue("videos")]
+        public string RemoteSavePath { get; set; } = string.Empty;
     }
 }
