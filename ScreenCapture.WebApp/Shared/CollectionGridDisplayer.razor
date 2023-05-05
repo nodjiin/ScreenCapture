@@ -52,16 +52,10 @@ else
     [Parameter] public RenderFragment<TCollectionItem>? CollectionItemTemplate { get; set; }
     [Parameter] public List<TCollectionItem>? Collection { get; set; }
 
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
         CalculateGridDimension();
-        base.OnInitialized();
-    }
-
-    protected override void OnAfterRender(bool first)
-    {
-        CalculateGridDimension();
-        base.OnAfterRender(first);
+        base.OnParametersSet();
     }
 
     private void CalculateGridDimension()
