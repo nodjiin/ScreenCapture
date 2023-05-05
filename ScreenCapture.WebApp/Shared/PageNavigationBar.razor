@@ -1,40 +1,79 @@
 ﻿<div class="mt-4 text-end">
-<hr />
-<nav aria-label="Page navigation example">
+    <hr />
+    <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-end">
-            <li class="page-item" disabled="(!@pageItemEnabled[0])">
-                <a class="page-link" @onclick="@(() => RaisePageItemClickEvent(pageItemNumbers[0]))" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-            <li class="page-item" disabled="@(!pageItemEnabled[1])"><a class="page-link" @onclick="@(() => RaisePageItemClickEvent(pageItemNumbers[1]))">1</a></li>
-            <li class="page-item" disabled="@(!pageItemEnabled[2])"><a class="page-link" @onclick="@(() => RaisePageItemClickEvent(pageItemNumbers[2]))">2</a></li>
-            <li class="page-item" disabled="@(!pageItemEnabled[3])"><a class="page-link" @onclick="@(() => RaisePageItemClickEvent(pageItemNumbers[3]))">3</a></li>
-            <li class="page-item" disabled="@(!pageItemEnabled[4])">
+            <li class="page-item">
+                <a class="page-link @(IsDisabled(pageItemEnabled[0]))" @onclick="@(() => RaisePageItemClickEvent(pageItemNumbers[0]))" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li class="page-item @(IsDisabled(pageItemEnabled[1]))"><a class="page-link @(IsActive(pageItemNumbers[1]))" @onclick="@(() => RaisePageItemClickEvent(pageItemNumbers[1]))">@pageItemNumbers[1]</a></li>
+            <li class="page-item @(IsDisabled(pageItemEnabled[2]))"><a class="page-link @(IsActive(pageItemNumbers[2]))" @onclick="@(() => RaisePageItemClickEvent(pageItemNumbers[2]))">@pageItemNumbers[2]</a></li>
+            <li class="page-item @(IsDisabled(pageItemEnabled[3]))"><a class="page-link @(IsActive(pageItemNumbers[3]))" @onclick="@(() => RaisePageItemClickEvent(pageItemNumbers[3]))">@pageItemNumbers[3]</a></li>
+            <li class="page-item @(IsDisabled(pageItemEnabled[4]))">
                 <a class="page-link" @onclick="@(() => RaisePageItemClickEvent(pageItemNumbers[4]))" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-            </a>
-        </li>
-    </ul>
-</nav>
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
 </div>
 
 @code {
+    // TODO update the number of pages displayed at the same time from 3 to a generic settable parameter.
+    // The behaviour of the 3 "MoveNavigation" methods is pretty similar, but requires to update the arrays in a dinamically calculated range between start/middle/end.
+    // A third visibility array would probably also be required, to avoid showing a wide range of empty items.
+
     [Parameter] public EventCallback<int> OnPageItemClick { get; set; }
     [Parameter] public int PageCount { get; set; }
+
+    private int _pageCount;
+    // TODO collect all bootstrap related string in a common Const class
+    private const string ActiveBoostrapClass = "active";
+    private const string DisabledBoostrapClass = "disabled";
+
     private int currentPage;
     private int[] pageItemNumbers = new int[5];
     private bool[] pageItemEnabled = new bool[5];
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
+            _pageCount = PageCount;
             currentPage = 1;
             MoveNavigationOnFirstPageItem();
         }
 
         base.OnAfterRender(firstRender);
+    }
+
+    /// <summary>
+    /// Blazor disallow the use of standard full properties, so any change to PageCount is observed through the support field _pageCount.
+    /// PageCount gets updated on 2 scenarios: at the pagination component creation and when the external page collection shrink/decreases.
+    /// Component initialization is handled in 'OnAfterRender', while this method handles Page Count updates.
+    /// </summary>
+    protected override void OnParametersSet()
+    {
+        // nothing has changed
+        if (_pageCount == PageCount)
+        {
+            return;
+        }
+
+        _pageCount = PageCount;
+
+        // the number of pages has shrunk, currentPage get moved to PageCount
+        if (PageCount < currentPage)
+        {
+            ChangeCurrentPageVisualization(PageCount);
+            return;
+        }
+
+        // the number of pages has changed in a way that doesn't directly impact the currently selected page, so we just update the component.
+        ChangeCurrentPageVisualization(currentPage);
+
+        base.OnParametersSet();
     }
 
     private async Task RaisePageItemClickEvent(int pageNumber)
@@ -45,8 +84,6 @@
 
     private void ChangeCurrentPageVisualization(int pageNumber)
     {
-        // TODO set active, check why disabled is not working 
-
         currentPage = pageNumber;
 
         if (currentPage == 1)
@@ -61,6 +98,7 @@
         {
             MoveNavigationOnLastPageItem();
         }
+        StateHasChanged();
     }
 
     private void MoveNavigationOnFirstPageItem()
@@ -69,7 +107,7 @@
         {
             pageItemNumbers[i] = i;
         }
-        pageItemNumbers[4] = 1;
+        pageItemNumbers[4] = 2;
 
         switch (PageCount)
         {
@@ -124,5 +162,15 @@
             default:
                 break;
         }
+    }
+
+    private string IsActive(int pageNumber)
+    {
+        return pageNumber == currentPage ? ActiveBoostrapClass : string.Empty;
+    }
+
+    private string IsDisabled(bool itemEnabled)
+    {
+        return itemEnabled ? string.Empty : DisabledBoostrapClass;
     }
 }

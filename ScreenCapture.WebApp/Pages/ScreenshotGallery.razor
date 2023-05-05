@@ -27,16 +27,14 @@
         {
             await ChangePage(0);
         }
-
-        // this duplicate StateHasChanged seems necessary for some reason... TODO investigate
-        StateHasChanged();
     }
 
     private async Task ChangePage(int pageNumber)
     {
         mediaInfoCollection.Clear();
+
         var screenshots = await explorer.FindStoredScreenshots();
-        pageCount = screenshots.Length;
+        pageCount = (int)Math.Ceiling(((decimal) screenshots.Length) / pagesize);
 
         for (int i = pageNumber; i < pagesize * (pageNumber + 1) && i < screenshots.Length; i++)
         {
@@ -46,7 +44,7 @@
                 mediaInfoCollection.Add(info);
             }
         }
-        
+
         StateHasChanged();
     }
 }
