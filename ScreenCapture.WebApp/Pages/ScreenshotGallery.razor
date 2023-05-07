@@ -10,16 +10,50 @@
         <text>No screenshot has been found.</text>
     </EmptyCollectionTemplate>
     <CollectionItemTemplate>
-        <ImageDisplayer Info="@context" />
+        <ImageDisplayer Info="@context" OnClick="OpenZoomedImage" />
     </CollectionItemTemplate>
 </CollectionGridDisplayer>
 
 <PageNavigationBar OnPageItemClick="ChangePage" PageCount="@pageCount" />
 
+<ModalContainer @ref="modal" FullScreen="true">
+    <HeaderTemplate>
+        @if (zoomedImage != null)
+        {
+            <text><strong>@zoomedImage.SourceMachine</strong> - @zoomedImage.Name</text>
+        }
+    </HeaderTemplate>
+    <BodyTemplate>
+        @if (zoomedImage != null)
+        {
+            <div id="carousel" class="carousel slide text-center">
+                <div class="carousel-inner">
+                    @foreach (var mediaInfo in mediaInfoCollection)
+                    {
+                        <div class="carousel-item @(mediaInfo == zoomedImage ? "active" : string.Empty)">
+                            <img src="/media/screenshot/@mediaInfo.Name" alt="@mediaInfo.Name" style="max-width: 100%; max-height: 90vh; margin:auto;" />
+                        </div>
+                    }
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true" style="filter:invert(50%)"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true" style="filter:invert(50%)"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        }
+    </BodyTemplate>
+</ModalContainer>
+
 @code {
     private const int pagesize = 16;
-    private List<MediaInfo> mediaInfoCollection = new List<MediaInfo>();
+    private List<MediaInfo> mediaInfoCollection = new List<MediaInfo>(pagesize);
     private int pageCount = 1;
+    private MediaInfo? zoomedImage;
+    private ModalContainer? modal;
 
     protected override async Task OnAfterRenderAsync(bool first)
     {
@@ -34,7 +68,7 @@
         mediaInfoCollection.Clear();
 
         var screenshots = await explorer.FindStoredScreenshots();
-        pageCount = (int)Math.Ceiling(((decimal) screenshots.Length) / pagesize);
+        pageCount = (int)Math.Ceiling(((decimal)screenshots.Length) / pagesize);
 
         for (int i = pageNumber; i < pagesize * (pageNumber + 1) && i < screenshots.Length; i++)
         {
@@ -46,5 +80,16 @@
         }
 
         StateHasChanged();
+    }
+
+    private async Task OpenZoomedImage(MediaInfo? info)
+    {
+        if (info == null || modal == null)
+        {
+            return;
+        }
+
+        zoomedImage = info;
+        await modal.Show();
     }
 }

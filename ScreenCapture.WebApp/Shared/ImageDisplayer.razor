@@ -5,7 +5,7 @@
 else
 {
     <div class="card" style="width: 18rem;">
-        <img class="card-img-top" src="/media/screenshot/@Info.Name" alt="@Info.Name">
+        <img class="card-img-top" src="/media/screenshot/@Info.Name" alt="@Info.Name" @onclick="RaiseOnClickNotification">
         <div class="card-body">
             <h6 class="card-subtitle mb-2 text-body-secondary">@Info.Name</h6>
         </div>
@@ -20,4 +20,10 @@ else
 
 @code {
     [Parameter] public MediaInfo? Info { get; set; }
+    [Parameter] public EventCallback<MediaInfo?> OnClick { get; set; }
+
+    private Task RaiseOnClickNotification()
+    {
+        return OnClick.InvokeAsync(Info);
+    }
 }
