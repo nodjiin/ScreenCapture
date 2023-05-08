@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Runtime.Versioning;
 using CaptureAgent.Configurations;
 using Microsoft.Extensions.Options;
+using CaptureAgent.Domain;
+using Core.Domain;
 
 namespace CaptureAgent.Services.Implementers;
 
@@ -13,25 +15,40 @@ namespace CaptureAgent.Services.Implementers;
 public class WindowsScreenSnapper : IScreenSnapper
 {
     private readonly MonitorConfiguration _monitorConfig;
+    private readonly string _machineName;
 
-    public WindowsScreenSnapper(IOptions<MonitorConfiguration> monitorConfig)
+    public WindowsScreenSnapper(IOptions<MonitorConfiguration> monitorConfig, IConfiguration config)
     {
         _monitorConfig = monitorConfig.Value;
+        _machineName = config.GetSection(Const.MachineNameKey).Value ?? string.Empty;
     }
 
-    public Task<string> TakeScreenshotAsync(ScreenshotOptions options, string folderPath) => Task.Run(() =>
+    public Task<MediaCreationReport<Metadata>> TakeScreenshotAsync(ScreenshotOptions options, string folderPath) => Task.Run(() =>
     {
-        string newImageName;
+        DateTime creationDate = DateTime.Now;
 
         // TODO multi-monitor, specific region selection, etc.
         (ImageFormat format, string fileExtension) = ValidateFormat(options.ImageFormat);
-        newImageName = $"{DateTime.Now.ToString("yyyy-MM-dd_HH.mm.ss", CultureInfo.InvariantCulture)}.{fileExtension}";
+        string newImageName = $"{creationDate.ToString("yyyy-MM-dd_HH.mm.ss", CultureInfo.InvariantCulture)}.{fileExtension}";
         using Bitmap screenshot = new Bitmap(_monitorConfig.Width, _monitorConfig.Height);
         using Graphics g = Graphics.FromImage(screenshot);
         g.CopyFromScreen(0, 0, 0, 0, screenshot.Size, CopyPixelOperation.SourceCopy);
         screenshot.Save($"{folderPath}{newImageName}", format);
 
-        return newImageName;
+        Metadata metadata = new()
+        {
+            CaptureMachine = _machineName,
+            Type = fileExtension,
+            Width = screenshot.Width,
+            Eight = screenshot.Height,
+            CreationDate = creationDate,
+        };
+
+        return new MediaCreationReport<Metadata>()
+        {
+            FileName = newImageName,
+            Metadata = metadata
+        };
     });
 
     private (ImageFormat format, string fileExtension) ValidateFormat(string? format)

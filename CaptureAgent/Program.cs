@@ -1,6 +1,8 @@
 using CaptureAgent.Configurations;
 using CaptureAgent.Services.Implementers;
 using CaptureAgent.Services.Interfaces;
+using Core.Services.Implementers;
+using Core.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc.Versioning;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +22,7 @@ builder.Services.AddApiVersioning(options =>
 builder.Services.AddSingleton<IScreenRecordingService, ScreenRecordingService>();
 builder.Services.AddSingleton<IScreenshotService, ScreenshotService>();
 builder.Services.AddSingleton<IFileTransferService, FileTransferService>();
+builder.Services.AddSingleton<IMetadataFileManager, XmlMetadataFileManager>();
 
 if (OperatingSystem.IsWindows())
 {

@@ -1,7 +1,9 @@
-﻿using Core.Dtos;
+﻿using CaptureAgent.Domain;
+using Core.Domain;
+using Core.Dtos;
 
 namespace CaptureAgent.Services.Interfaces;
 public interface IScreenSnapper
 {
-    public Task<string> TakeScreenshotAsync(ScreenshotOptions options, string folderPath);
+    public Task<MediaCreationReport<Metadata>> TakeScreenshotAsync(ScreenshotOptions options, string folderPath);
 }
