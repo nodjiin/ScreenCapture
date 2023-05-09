@@ -40,8 +40,8 @@ public class WindowsScreenSnapper : IScreenSnapper
             CaptureMachine = _machineName,
             Type = fileExtension,
             Width = screenshot.Width,
-            Eight = screenshot.Height,
-            CreationDate = creationDate,
+            Height = screenshot.Height,
+            CreationDateTime = creationDate,
         };
 
         return new MediaCreationReport<Metadata>()

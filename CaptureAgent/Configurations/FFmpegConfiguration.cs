@@ -2,5 +2,7 @@
 public class FFmpegConfiguration
 {
     [FileExists]
-    public string ApplicationPath { get; set; } = string.Empty;
+    public string FFmpegPath { get; set; } = string.Empty;
+    [FileExists]
+    public string FFprobePath { get; set; } = string.Empty;
 }

@@ -47,7 +47,7 @@ public class ScreenshotService : IScreenshotService
 
         await _transferService.SendFileAsync(Path.Combine(_fullPath, report.FileName), _config.RemoteSavePath).ConfigureAwait(false);
         string metadataFilePath = Path.Combine(_fullPath, Path.ChangeExtension(report.FileName, "xml"));
-        await _metadataManager.CreateMetadataFileAsync(report.Metadata, metadataFilePath);
+        await _metadataManager.CreateMetadataFileAsync(report.Metadata, metadataFilePath).ConfigureAwait(false);
         await _transferService.SendFileAsync(Path.Combine(_fullPath, metadataFilePath), _config.RemoteSavePath).ConfigureAwait(false);
 
         return report.FileName;

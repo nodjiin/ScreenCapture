@@ -1,6 +1,9 @@
 ﻿using CaptureAgent.Configurations;
+using CaptureAgent.Domain;
 using CaptureAgent.Services.Interfaces;
+using Core.Domain;
 using Core.Dtos;
+using Core.Services.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace CaptureAgent.Services.Implementers;
@@ -12,14 +15,16 @@ public class ScreenRecordingService : IScreenRecordingService
     private readonly string _remoteSavePath;
     private readonly IVideoRecorder _recorder;
     private readonly IFileTransferService _transferService;
+    private readonly IMetadataFileManager _metadataManager;
 
-    public ScreenRecordingService(IOptions<ScreenRecordingServiceConfiguration> config, IVideoRecorder recorder, IFileTransferService transferService)
+    public ScreenRecordingService(IOptions<ScreenRecordingServiceConfiguration> config, IVideoRecorder recorder, IFileTransferService transferService, IMetadataFileManager metadataManager)
     {
         _config = config.Value;
         _fullPath = Path.GetFullPath(_config.LocalSavePath);
         _remoteSavePath = _config.RemoteSavePath;
         _recorder = recorder;
         _transferService = transferService;
+        _metadataManager = metadataManager;
     }
 
     public RecordingStatus Status { get; set; }
@@ -60,18 +65,27 @@ public class ScreenRecordingService : IScreenRecordingService
         }
 
         Status = RecordingStatus.Idle;
-        string recordedVideo;
+        MediaCreationReport<VideoMetadata> report;
 
         try
         {
-            recordedVideo = await _recorder.StopRecordingAsync().ConfigureAwait(false);
+            report = await _recorder.StopRecordingAsync().ConfigureAwait(false);
         }
         finally
         {
             _semaphore.Release();
         }
 
-        await _transferService.SendFileAsync(Path.Combine(_fullPath, recordedVideo), _remoteSavePath).ConfigureAwait(false);
-        return recordedVideo;
+        if (string.IsNullOrWhiteSpace(report.FileName))
+        {
+            throw new InvalidOperationException("Failed to create video file.");
+        }
+
+        await _transferService.SendFileAsync(Path.Combine(_fullPath, report.FileName), _remoteSavePath).ConfigureAwait(false);
+        string metadataFilePath = Path.Combine(_fullPath, Path.ChangeExtension(report.FileName, "xml"));
+        await _metadataManager.CreateMetadataFileAsync(report.Metadata, metadataFilePath).ConfigureAwait(false);
+        await _transferService.SendFileAsync(Path.Combine(_fullPath, metadataFilePath), _config.RemoteSavePath).ConfigureAwait(false);
+
+        return report.FileName;
     }
 }
