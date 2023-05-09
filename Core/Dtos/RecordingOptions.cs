@@ -5,9 +5,14 @@ namespace Core.Dtos;
 
 // The input device currently used to grab video from the screen is GDI screengrabber.
 // For more info take a look at https://ffmpeg.org/ffmpeg-devices.html#gdigrab
+// TODO take a look at ddagrab implementation
 [SettingKey("video")]
 public class RecordingOptions
 {
+    [DefaultValue("mp4")]
+    [SettingKey("video_format")]
+    public string? VideoFormat { get; set; }
+
     [DefaultValue(null)]
     [SettingKey("draw_mouse")]
     public string? DrawMouse { get; set; }
