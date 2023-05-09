@@ -6,12 +6,12 @@ else
 {
     <div class="card" style="width: 18rem;">
         <img class="card-img-top" src="/media/screenshot/@Info.Name" alt="@Info.Name" @onclick="RaiseOnClickNotification">
-        <div class="card-body">
+@*        <div class="card-body">
             <h6 class="card-subtitle mb-2 text-body-secondary">@Info.Name</h6>
-        </div>
+        </div>*@
         <ul class="list-group list-group-flush">
-            <li class="list-group-item"><strong>Source Machine:</strong> @Info.SourceMachine</li>
-            <li class="list-group-item"><strong>Size:</strong> @Info.Size</li>
+            <li class="list-group-item"><strong>Name:</strong> @Info.Name</li>
+            <li class="list-group-item"><strong>Source:</strong> @Info.SourceMachine</li>
         </ul>
     </div>
 }
