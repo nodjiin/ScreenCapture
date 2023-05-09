@@ -41,7 +41,8 @@ public class LocalDiskMediaExplorer : IMediaExplorer
 
         try
         {
-            content = Directory.EnumerateFiles(directory).Select(v => Path.GetFileName(v)).ToArray();
+            // filtering out all the xml metadata files
+            content = Directory.EnumerateFiles(directory).Where(f => Path.GetExtension(f).ToLowerInvariant() != ".xml").Select(v => Path.GetFileName(v)).ToArray();
         }
         catch (Exception ex)
         {
