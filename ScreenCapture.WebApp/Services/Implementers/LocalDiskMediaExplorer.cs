@@ -1,4 +1,6 @@
-﻿using ScreenCapture.WebApp.Domain;
+﻿using Core.Domain;
+using Core.Services.Interfaces;
+using ScreenCapture.WebApp.Domain;
 using ScreenCapture.WebApp.Services.Interfaces;
 
 namespace ScreenCapture.WebApp.Services.Implementers;
@@ -10,13 +12,15 @@ public class LocalDiskMediaExplorer : IMediaExplorer
     private readonly string _videoSubfolderFullPath;
     private readonly string _screenshotSubfolderFullPath;
     private readonly ILogger<LocalDiskMediaExplorer> _logger;
+    private readonly IMetadataFileManager _metadataManager;
 
-    public LocalDiskMediaExplorer(ILogger<LocalDiskMediaExplorer> logger, IConfiguration configuration)
+    public LocalDiskMediaExplorer(ILogger<LocalDiskMediaExplorer> logger, IConfiguration configuration, IMetadataFileManager metadataManager)
     {
         _logger = logger;
         string localDiskMediaFolder = configuration.GetValue<string>("MediaPath") ?? throw new InvalidOperationException("The path to the media storage has not been configured");
         _videoSubfolderFullPath = Path.Combine(localDiskMediaFolder, videoSubfolder);
         _screenshotSubfolderFullPath = Path.Combine(localDiskMediaFolder, screenshotSubfolder);
+        _metadataManager = metadataManager;
     }
 
     public Task<string[]> FindStoredVideos()
@@ -53,17 +57,18 @@ public class LocalDiskMediaExplorer : IMediaExplorer
         return content;
     }
 
-    public Task<MediaInfo?> GetVideoInformation(string name)
+    public Task<MediaInfo<VideoMetadata>?> GetVideoInformation(string name)
     {
-        return Task.Run(() => GetMediaInformation(_videoSubfolderFullPath, name));
+        return Task.Run(() => GetMediaInformation<VideoMetadata>(_videoSubfolderFullPath, name));
     }
 
-    public Task<MediaInfo?> GetScreenshotInformation(string name)
+    public Task<MediaInfo<Metadata>?> GetScreenshotInformation(string name)
     {
-        return Task.Run(() => GetMediaInformation(_screenshotSubfolderFullPath, name));
+        return Task.Run(() => GetMediaInformation<Metadata>(_screenshotSubfolderFullPath, name));
     }
 
-    private MediaInfo? GetMediaInformation(string folderPath, string name)
+    private async Task<MediaInfo<Tmetadata>?> GetMediaInformation<Tmetadata>(string folderPath, string name)
+        where Tmetadata : class
     {
         FileInfo fileInfo;
 
@@ -84,11 +89,22 @@ public class LocalDiskMediaExplorer : IMediaExplorer
             return null;
         }
 
-        return new MediaInfo()
+        MediaInfo<Tmetadata> info = new()
         {
             Name = fileInfo.Name,
-            Path = fileInfo.FullName,
-            Extension = fileInfo.Extension
+            Path = fileInfo.FullName
         };
+
+        string metadataFileName = Path.ChangeExtension(fileInfo.FullName, "xml");
+        if (File.Exists(metadataFileName))
+        {
+            info.Metadata = await _metadataManager.ParseMetadataFileAsync<Tmetadata>(metadataFileName);
+        }
+        else
+        {
+            _logger.LogWarning($"Could not locate metadata file '{metadataFileName}'");
+        }
+
+        return info;
     }
 }

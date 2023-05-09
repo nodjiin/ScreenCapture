@@ -1,5 +1,6 @@
 ﻿@page "/Gallery/Screenshot"
 
+@using Core.Domain;
 @using ScreenCapture.WebApp.Services.Interfaces;
 @inject IMediaExplorer explorer
 
@@ -20,7 +21,7 @@
     <HeaderTemplate>
         @if (zoomedImage != null)
         {
-            <text><strong>@zoomedImage.SourceMachine</strong> - @zoomedImage.Name</text>
+            <text><strong>@zoomedImage.Metadata?.CaptureMachine</strong>: @zoomedImage.Name</text>
         }
     </HeaderTemplate>
     <BodyTemplate>
@@ -50,9 +51,9 @@
 
 @code {
     private const int pagesize = 16;
-    private List<MediaInfo> mediaInfoCollection = new List<MediaInfo>(pagesize);
+    private List<MediaInfo<Metadata>> mediaInfoCollection = new List<MediaInfo<Metadata>>(pagesize);
     private int pageCount = 1;
-    private MediaInfo? zoomedImage;
+    private MediaInfo<Metadata>? zoomedImage;
     private ModalContainer? modal;
 
     protected override async Task OnAfterRenderAsync(bool first)
@@ -82,7 +83,7 @@
         StateHasChanged();
     }
 
-    private async Task OpenZoomedImage(MediaInfo? info)
+    private async Task OpenZoomedImage(MediaInfo<Metadata>? info)
     {
         if (info == null || modal == null)
         {

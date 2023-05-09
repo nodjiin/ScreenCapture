@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ScreenCapture.WebApp.Domain;
 using ScreenCapture.WebApp.Services.Interfaces;
 
 namespace ScreenCapture.WebApp.Controllers
@@ -25,13 +24,13 @@ namespace ScreenCapture.WebApp.Controllers
         [HttpGet("video/{name}")]
         public async Task<IActionResult> Video([FromRoute] string name)
         {
-            MediaInfo? info = await _explorer.GetVideoInformation(name);
+            var info = await _explorer.GetVideoInformation(name);
             if (info == null)
             {
                 return BadRequest("The requested video has not been found.");
             }
 
-            return PhysicalFile(info.Path, $"video/{info.Extension}"); // TODO I need an 'extension to content type' converter
+            return PhysicalFile(info.Path, $"video/{info.Metadata?.Type}"); // TODO I need an 'extension to content type' converter
         }
 
         [HttpGet("screenshot")]
@@ -43,13 +42,13 @@ namespace ScreenCapture.WebApp.Controllers
         [HttpGet("screenshot/{name}")]
         public async Task<IActionResult> Screenshot([FromRoute] string name)
         {
-            MediaInfo? info = await _explorer.GetScreenshotInformation(name);
+            var info = await _explorer.GetScreenshotInformation(name);
             if (info == null)
             {
                 return BadRequest("The requested screenshot has not been found."); // TODO I need an 'extension to content type' converter
             }
 
-            return PhysicalFile(info.Path, $"image/{info.Extension}");
+            return PhysicalFile(info.Path, $"image/{info.Metadata?.Type}");
         }
     }
 }

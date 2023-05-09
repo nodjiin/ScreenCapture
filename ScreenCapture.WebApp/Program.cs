@@ -1,4 +1,6 @@
 using Core.Configurations;
+using Core.Services.Implementers;
+using Core.Services.Interfaces;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +24,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddSingleton<IRemoteAgentsMonitor, RemoteAgentsMonitor>();
 builder.Services.AddSingleton<IRemoteAgentCommunicationManager, RemoteAgentCommunicationManager>();
+builder.Services.AddSingleton<IMetadataFileManager, XmlMetadataFileManager>();
 builder.Services.AddScoped<IDtoFactory, LocalStorageDtoFactory>();
 builder.Services.AddScoped<IMediaExplorer, LocalDiskMediaExplorer>();
 builder.Services.AddHttpClient();

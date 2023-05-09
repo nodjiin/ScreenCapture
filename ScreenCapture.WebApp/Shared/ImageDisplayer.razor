@@ -1,4 +1,5 @@
-﻿@if(Info == null)
+﻿@using Core.Domain;
+@if(Info == null)
 {
     <ErrorCard ErrorText="The screenshot has not been loaded correctly" />
 }
@@ -8,7 +9,7 @@ else
         <img class="card-img-top" src="/media/screenshot/@Info.Name" alt="@Info.Name" @onclick="RaiseOnClickNotification">
         <ul class="list-group list-group-flush">
             <li class="list-group-item"><strong>Name:</strong> @Info.Name</li>
-            <li class="list-group-item"><strong>Source:</strong> @Info.SourceMachine</li>
+            <li class="list-group-item"><strong>Source:</strong> @Info.Metadata?.CaptureMachine</li>
         </ul>
     </div>
 }
@@ -16,9 +17,8 @@ else
 
 
 @code {
-    [Parameter] public MediaInfo? Info { get; set; }
-    [Parameter] public EventCallback<MediaInfo?> OnClick { get; set; }
-
+    [Parameter] public MediaInfo<Metadata>? Info { get; set; }
+    [Parameter] public EventCallback<MediaInfo<Metadata>?> OnClick { get; set; }
     private Task RaiseOnClickNotification()
     {
         return OnClick.InvokeAsync(Info);
