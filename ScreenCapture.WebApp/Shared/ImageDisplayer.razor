@@ -7,10 +7,9 @@ else
 {
     <div class="card" style="width: 18rem;">
         <img class="card-img-top" src="/media/screenshot/@Info.Name" alt="@Info.Name" @onclick="RaiseOnClickNotification">
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item"><strong>Name:</strong> @Info.Name</li>
-            <li class="list-group-item"><strong>Source:</strong> @Info.Metadata?.CaptureMachine</li>
-        </ul>
+        <p class="card-text">
+            <i class="bi bi-chevron-left" /><strong>@(Info.Metadata?.CaptureMachine)</strong><i class="bi bi-chevron-right" /> - @Info.Name
+        </p>
     </div>
 }
 

@@ -1,5 +1,52 @@
 ﻿@page "/Gallery/Video"
 
-@code {
+@using Core.Domain;
+@using ScreenCapture.WebApp.Services.Interfaces;
+@inject IMediaExplorer explorer
 
+<PageTitle>Video Gallery</PageTitle>
+
+<CollectionGridDisplayer Collection="mediaInfoCollection">
+    <EmptyCollectionTemplate>
+        <text>No video has been found.</text>
+    </EmptyCollectionTemplate>
+    <CollectionItemTemplate>
+        <VideoDisplayer Info="@context" />
+    </CollectionItemTemplate>
+</CollectionGridDisplayer>
+
+<PageNavigationBar OnPageItemClick="ChangePage" PageCount="@pageCount" />
+
+@code {
+    private const int pagesize = 12;    // smaller pagesize than screenshot gallery to outset the larger video displayer dimension
+    private List<MediaInfo<VideoMetadata>> mediaInfoCollection = new List<MediaInfo<VideoMetadata>>(pagesize);
+    private int pageCount = 1;
+    private MediaInfo<VideoMetadata>? currentVideo;
+
+    protected override async Task OnAfterRenderAsync(bool first)
+    {
+        if (first)
+        {
+            await ChangePage(0);
+        }
+    }
+
+    private async Task ChangePage(int pageNumber)
+    {
+        mediaInfoCollection.Clear();
+
+        var screenshots = await explorer.FindStoredVideos();
+        pageCount = (int)Math.Ceiling(((decimal)screenshots.Length) / pagesize);
+
+        for (int i = pageNumber; i < pagesize * (pageNumber + 1) && i < screenshots.Length; i++)
+        {
+            var info = await explorer.GetVideoInformation(screenshots[i]);
+            if (info != null)
+            {
+                mediaInfoCollection.Add(info);
+            }
+        }
+
+        StateHasChanged();
+    }
 }
