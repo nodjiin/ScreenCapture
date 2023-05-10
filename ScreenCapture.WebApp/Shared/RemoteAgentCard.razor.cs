@@ -17,7 +17,7 @@ public partial class RemoteAgentCard : IDisposable
     #region LifeTime
     protected override void OnAfterRender(bool firstRender)
     {
-        if (Agent != null)
+        if (Agent != null && firstRender)
         {
             Agent.OnStatusChanged += UpdateAfterChange;
         }
@@ -25,9 +25,9 @@ public partial class RemoteAgentCard : IDisposable
         base.OnAfterRender(firstRender);
     }
 
-    private async Task UpdateAfterChange()
+    private Task UpdateAfterChange()
     {
-        await InvokeAsync(StateHasChanged);
+        return InvokeAsync(StateHasChanged);
     }
     #endregion
 
@@ -50,6 +50,8 @@ public partial class RemoteAgentCard : IDisposable
                 return "text-success";
             case (RemoteAgentStatus.Error): // yellow since red is already used to identify active recording
                 return "text-warning";
+            case (RemoteAgentStatus.Initializing):
+                return "text-danger";
             case (RemoteAgentStatus.Recording):
                 return "text-danger recording";
             case (RemoteAgentStatus.Offline):

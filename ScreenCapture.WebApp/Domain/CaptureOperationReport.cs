@@ -13,7 +13,7 @@ public class CaptureOperationReport
     public static CaptureOperationReport SuccessfulReport(RemoteAgentStatus status, string? newFileName = null) => new CaptureOperationReport()
     {
         IsSuccessful = true,
-        AgentStatusAfterOperation = RemoteAgentStatus.Online,
+        AgentStatusAfterOperation = status,
         NewFileName = newFileName
     };
 

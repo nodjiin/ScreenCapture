@@ -40,6 +40,12 @@ public class RemoteAgent : IRemoteAgent
 
     public async Task UpdateStatusAsync()
     {
+        // skip the update cycle if an operation is currently being initialized
+        if (_status == RemoteAgentStatus.Initializing)
+        {
+            return;
+        }
+
         var newStatus = await _communicationManager.GetStatusAsync(this).ConfigureAwait(false);
         if (newStatus != RemoteAgentStatus.Offline)
         {
@@ -55,6 +61,7 @@ public class RemoteAgent : IRemoteAgent
 
     public async Task<CaptureOperationReport> StartRecordingAsync(RecordingOptions options)
     {
+        Status = RemoteAgentStatus.Initializing;
         var report = await _communicationManager.StartRecordingAsync(this, options).ConfigureAwait(false);
         Status = report.AgentStatusAfterOperation;
         return report;
@@ -82,6 +89,7 @@ public enum RemoteAgentStatus
 {
     Offline,
     Online,
+    Initializing,
     Recording,
     Error
 }

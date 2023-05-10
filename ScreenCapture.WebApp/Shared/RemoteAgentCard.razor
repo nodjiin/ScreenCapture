@@ -21,13 +21,13 @@ else
         <div class="card-body">
             @if (Agent.Status == RemoteAgentStatus.Recording)
             {
-                <button class="btn btn-secondary me-1" @onclick="OnStopRecordingButtonClickAsync" disabled="@IsDisabled()"><i class="bi bi-stop-fill"></i></button>
+                <button class="btn btn-secondary me-1 shadow-none" @onclick="OnStopRecordingButtonClickAsync" disabled="@IsDisabled()"><i class="bi bi-stop-fill"></i></button>
             }
             else
             {
-                <button class="btn btn-secondary me-1" @onclick="OnStartRecordingButtonClickAsync" disabled="@IsDisabled()"><i class="bi bi-record"></i></button>
+                <button class="btn btn-secondary me-1 shadow-none" @onclick="OnStartRecordingButtonClickAsync" disabled="@IsDisabled()"><i class="bi bi-record"></i></button>
             }
-            <button class="btn btn-secondary ms-1" @onclick="OnTakeScreenshotButtonClickAsync" disabled="@IsDisabled()"><i class="bi bi-camera"></i></button>
+            <button class="btn btn-secondary ms-1 shadow-none" @onclick="OnTakeScreenshotButtonClickAsync" disabled="@IsDisabled()"><i class="bi bi-camera"></i></button>
         </div>
     </div>
 }
