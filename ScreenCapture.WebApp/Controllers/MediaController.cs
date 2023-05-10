@@ -9,10 +9,11 @@ namespace ScreenCapture.WebApp.Controllers
     public class MediaController : Controller
     {
         private readonly IMediaExplorer _explorer;
-
-        public MediaController(IMediaExplorer explorer)
+        private readonly IWebHostEnvironment _environment;
+        public MediaController(IMediaExplorer explorer, IWebHostEnvironment environment)
         {
             _explorer = explorer;
+            _environment = environment;
         }
 
         [HttpGet("video")]
@@ -30,7 +31,7 @@ namespace ScreenCapture.WebApp.Controllers
                 return BadRequest("The requested video has not been found.");
             }
 
-            return PhysicalFile(info.Path, $"video/{info.Metadata?.Type}"); // TODO I need an 'extension to content type' converter
+            return File(System.IO.File.OpenRead(info.Path), $"video/{info.Metadata?.Type}", enableRangeProcessing: true); // TODO I need an 'extension to content type' converter
         }
 
         [HttpGet("screenshot")]
