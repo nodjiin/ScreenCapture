@@ -21,7 +21,6 @@
     private const int pagesize = 12;    // smaller pagesize than screenshot gallery to outset the larger video displayer dimension
     private List<MediaInfo<VideoMetadata>> mediaInfoCollection = new List<MediaInfo<VideoMetadata>>(pagesize);
     private int pageCount = 1;
-    private MediaInfo<VideoMetadata>? currentVideo;
 
     protected override async Task OnAfterRenderAsync(bool first)
     {
