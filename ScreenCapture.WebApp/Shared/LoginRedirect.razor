@@ -1,0 +1,10 @@
+﻿@attribute [AllowAnonymous]
+@inject NavigationManager _navigationManager
+
+@code {
+    protected override void OnAfterRender(bool first)
+    {
+        base.OnAfterRender(first);
+        _navigationManager.NavigateTo("/Identity/Account/Login", true);
+    }
+}
