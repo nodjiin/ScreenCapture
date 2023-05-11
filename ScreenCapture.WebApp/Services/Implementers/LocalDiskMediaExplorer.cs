@@ -2,6 +2,7 @@
 using Core.Services.Interfaces;
 using ScreenCapture.WebApp.Domain;
 using ScreenCapture.WebApp.Services.Interfaces;
+using System.Collections.Concurrent;
 
 namespace ScreenCapture.WebApp.Services.Implementers;
 
@@ -13,6 +14,11 @@ public class LocalDiskMediaExplorer : IMediaExplorer
     private readonly string _screenshotSubfolderFullPath;
     private readonly ILogger<LocalDiskMediaExplorer> _logger;
     private readonly IMetadataFileManager _metadataManager;
+
+    // This cache is created following the principle that, due to the monitoring scope of the application, saved videos and images are always created with a unique name and never deleted.
+    // TODO add a configurable functionality to purge/recreate the cache.  
+    private static readonly ConcurrentDictionary<string, MediaInfo<Metadata>> _screenshotCache = new();
+    private static readonly ConcurrentDictionary<string, MediaInfo<VideoMetadata>> _videoCache = new();
 
     public LocalDiskMediaExplorer(ILogger<LocalDiskMediaExplorer> logger, IConfiguration configuration, IMetadataFileManager metadataManager)
     {
@@ -57,14 +63,44 @@ public class LocalDiskMediaExplorer : IMediaExplorer
         return content;
     }
 
-    public Task<MediaInfo<VideoMetadata>?> GetVideoInformation(string name)
+    public async Task<MediaInfo<VideoMetadata>?> GetVideoInformation(string name)
     {
-        return Task.Run(() => GetMediaInformation<VideoMetadata>(_videoSubfolderFullPath, name));
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return null;
+        }
+
+        MediaInfo<VideoMetadata>? info;
+        if (!_videoCache.TryGetValue(name, out info))
+        {
+            info = await GetMediaInformation<VideoMetadata>(_videoSubfolderFullPath, name);
+            if (info != null)
+            {
+                _videoCache.TryAdd(name, info);
+            }
+        }
+
+        return info;
     }
 
-    public Task<MediaInfo<Metadata>?> GetScreenshotInformation(string name)
+    public async Task<MediaInfo<Metadata>?> GetScreenshotInformation(string name)
     {
-        return Task.Run(() => GetMediaInformation<Metadata>(_screenshotSubfolderFullPath, name));
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return null;
+        }
+
+        MediaInfo<Metadata>? info;
+        if (!_screenshotCache.TryGetValue(name, out info))
+        {
+            info = await GetMediaInformation<Metadata>(_screenshotSubfolderFullPath, name);
+            if (info != null)
+            {
+                _screenshotCache.TryAdd(name, info);
+            }
+        }
+
+        return info;
     }
 
     private async Task<MediaInfo<Tmetadata>?> GetMediaInformation<Tmetadata>(string folderPath, string name)
