@@ -1,27 +1,39 @@
-﻿@page
-@model PersonalDataModel
+﻿@*Disabled register page as suggested by the documentation:
+https://learn.microsoft.com/en-us/aspnet/core/security/authentication/scaffold-identity?view=aspnetcore-7.0&tabs=visual-studio#disable-a-page*@
+
+@page
+@attribute [IgnoreAntiforgeryToken]
+@inject SignInManager<IdentityUser> SignInManager
 @{
-    ViewData["Title"] = "Personal Data";
-    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+    ViewData["Title"] = "Go to Login";
 }
 
-<h3>@ViewData["Title"]</h3>
+<h1>@ViewData["Title"]</h1>
 
-<div class="row">
-    <div class="col-md-6">
-        <p>Your account contains personal data that you have given us. This page allows you to download or delete that data.</p>
-        <p>
-            <strong>Deleting this data will permanently remove your account, and this cannot be recovered.</strong>
-        </p>
-        <form id="download-data" asp-page="DownloadPersonalData" method="post">
-            <button class="btn btn-primary" type="submit">Download</button>
-        </form>
-        <p>
-            <a id="delete" asp-page="DeletePersonalData" class="btn btn-danger">Delete</a>
-        </p>
-    </div>
-</div>
+<li class="nav-item">
+    <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
+</li>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+
+@functions {
+
+    public IActionResult OnGet()
+    {
+        if (SignInManager != null && SignInManager.IsSignedIn(User))
+        {
+            return Redirect("/");
+        }
+
+        return RedirectToPage("Login");
+    }
+
+    public IActionResult OnPost()
+    {
+        if (SignInManager != null && SignInManager.IsSignedIn(User))
+        {
+            return Redirect("/");
+        }
+
+        return RedirectToPage("Login");
+    }
 }
