@@ -1,6 +1,9 @@
 ﻿<nav class="nav">
     <AuthorizeView>
         <Authorized>
+            <form method="get" action="Identity/Account/Manage">
+                <button type="submit" class="nav-link btn btn-link shadow-none" title="Manage Account"><i class="bi bi-person-circle fs-3"></i></button>
+            </form>
             <form method="post" action="Identity/Account/Logout">
                 <button type="submit" class="nav-link btn btn-link shadow-none" title="Log out"><i class="bi bi-box-arrow-right fs-3"></i></button>
             </form>
