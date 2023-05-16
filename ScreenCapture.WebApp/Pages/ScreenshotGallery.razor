@@ -100,6 +100,16 @@
     {
         bool match = true;
 
+        if (!string.IsNullOrWhiteSpace(filterArgs.MediaName))
+        {
+            if (string.IsNullOrWhiteSpace(info.Name))
+            {
+                return false;
+            }
+
+            match &= info.Name.ToLowerInvariant().StartsWith(filterArgs.MediaName.Trim().ToLowerInvariant());
+        }
+
         if (!string.IsNullOrWhiteSpace(filterArgs.MachineName))
         {
             if (string.IsNullOrWhiteSpace(info.Metadata?.CaptureMachine))
@@ -110,6 +120,35 @@
             match &= info.Metadata.CaptureMachine.ToLowerInvariant().StartsWith(filterArgs.MachineName.Trim().ToLowerInvariant());
         }
 
+        if (!string.IsNullOrWhiteSpace(filterArgs.MediaType))
+        {
+            if (string.IsNullOrWhiteSpace(info.Metadata?.Type))
+            {
+                return false;
+            }
+
+            match &= info.Metadata.Type.ToLowerInvariant().StartsWith(filterArgs.MediaType.Trim().ToLowerInvariant());
+        }
+
+        if (filterArgs.BeginDateTimeRange != null)
+        {
+            if (info.Metadata?.CreationDateTime == null)
+            {
+                return false;
+            }
+
+            match &= info.Metadata.CreationDateTime >= filterArgs.BeginDateTimeRange;
+        }
+
+        if (filterArgs.EndDateTimeRange != null)
+        {
+            if (info.Metadata?.CreationDateTime == null)
+            {
+                return false;
+            }
+
+            match &= info.Metadata.CreationDateTime <= filterArgs.EndDateTimeRange;
+        }
         return match;
     }
 
