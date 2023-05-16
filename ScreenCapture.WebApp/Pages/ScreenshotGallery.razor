@@ -17,7 +17,6 @@
     </CollectionGridDisplayer>
 
     <MediaFilter OnApplyFilter="FilterMediaCollection" />
-
 </div>
 
 <PageNavigationBar OnPageItemClick="ChangePage" PageCount="@pageCount" />
@@ -79,7 +78,7 @@
 
         // we use the padding to keep the loop going in case we have to discard some media
         int padding = 0;
-        for (int i = pageNumber; i < pagesize * (pageNumber + 1) + padding && i < screenshots.Length; i++)
+        for (int i = pageNumber; i < (pagesize * (pageNumber + 1) + padding) && i < screenshots.Length; i++)
         {
             var info = await explorer.GetScreenshotInformation(screenshots[i]);
 
