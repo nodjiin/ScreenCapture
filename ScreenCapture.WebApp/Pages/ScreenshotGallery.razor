@@ -9,7 +9,18 @@
 <div class="d-flex flex-row">
     <CollectionGridDisplayer Collection="mediaInfoCollection">
         <EmptyCollectionTemplate>
-            <text>No screenshot has been found.</text>
+            @if (firstLoading)
+            {
+                <div class="container text-center">
+                    <div class="spinner-border ms-auto text-secondary" role="status" aria-hidden="true"></div>
+                </div>
+            }
+            else
+            {
+                <div class="container text-center">
+                    <text>No screenshot has been found.</text>
+                </div>
+            }
         </EmptyCollectionTemplate>
         <CollectionItemTemplate>
             <ImageDisplayer Info="@context" OnClick="OpenZoomedImage" />
@@ -60,12 +71,14 @@
     private MediaInfo<Metadata>? zoomedImage;
     private ModalContainer? modal;
     MediaFilter.FilterArgs? filterArgs;
+    private bool firstLoading = true;
 
     protected override async Task OnAfterRenderAsync(bool first)
     {
         if (first)
         {
             await ChangePage(0);
+            firstLoading = false;
         }
     }
 
