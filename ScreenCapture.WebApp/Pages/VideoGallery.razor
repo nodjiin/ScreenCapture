@@ -6,14 +6,29 @@
 
 <PageTitle>Video Gallery</PageTitle>
 
-<CollectionGridDisplayer Collection="mediaInfoCollection">
-    <EmptyCollectionTemplate>
-        <text>No video has been found.</text>
-    </EmptyCollectionTemplate>
-    <CollectionItemTemplate>
-        <VideoDisplayer Info="@context" />
-    </CollectionItemTemplate>
-</CollectionGridDisplayer>
+<div class="d-flex flex-row">
+    <CollectionGridDisplayer Collection="mediaInfoCollection">
+        <EmptyCollectionTemplate>
+            @if (firstLoading)
+            {
+                <div class="container text-center">
+                    <div class="spinner-border ms-auto text-secondary" role="status" aria-hidden="true"></div>
+                </div>
+            }
+            else
+            {
+                <div class="container text-center">
+                    <text>No recorded video has been found.</text>
+                </div>
+            }
+        </EmptyCollectionTemplate>
+        <CollectionItemTemplate>
+            <VideoDisplayer Info="@context" />
+        </CollectionItemTemplate>
+    </CollectionGridDisplayer>
+
+    <MediaFilter OnApplyFilter="FilterMediaCollection" />
+</div>
 
 <PageNavigationBar OnPageItemClick="ChangePage" PageCount="@pageCount" />
 
@@ -21,12 +36,15 @@
     private const int pagesize = 12;    // smaller pagesize than screenshot gallery to outset the larger video displayer dimension
     private List<MediaInfo<VideoMetadata>> mediaInfoCollection = new List<MediaInfo<VideoMetadata>>(pagesize);
     private int pageCount = 1;
+    MediaFilter.FilterArgs? filterArgs;
+    private bool firstLoading = true;
 
     protected override async Task OnAfterRenderAsync(bool first)
     {
         if (first)
         {
             await ChangePage(0);
+            firstLoading = false;
         }
     }
 
@@ -37,15 +55,85 @@
         var screenshots = await explorer.FindStoredVideos();
         pageCount = (int)Math.Ceiling(((decimal)screenshots.Length) / pagesize);
 
-        for (int i = pageNumber; i < pagesize * (pageNumber + 1) && i < screenshots.Length; i++)
+        int padding = 0;
+        for (int i = pageNumber; i < (pagesize * (pageNumber + 1) + padding) && i < screenshots.Length; i++)
         {
             var info = await explorer.GetVideoInformation(screenshots[i]);
-            if (info != null)
+
+            // check that info are valid and match the filter (if any)
+            if (info == null || (filterArgs != null && !MatchFilter(info, filterArgs)))
             {
-                mediaInfoCollection.Add(info);
+                padding++;
+                continue;
             }
+
+            mediaInfoCollection.Add(info);
         }
 
         StateHasChanged();
+    }
+
+    // TODO additional filter like duration.
+    private bool MatchFilter(MediaInfo<VideoMetadata> info, MediaFilter.FilterArgs filterArgs)
+    {
+        bool match = true;
+
+        if (!string.IsNullOrWhiteSpace(filterArgs.MediaName))
+        {
+            if (string.IsNullOrWhiteSpace(info.Name))
+            {
+                return false;
+            }
+
+            match &= info.Name.ToLowerInvariant().StartsWith(filterArgs.MediaName.Trim().ToLowerInvariant());
+        }
+
+        if (!string.IsNullOrWhiteSpace(filterArgs.MachineName))
+        {
+            if (string.IsNullOrWhiteSpace(info.Metadata?.CaptureMachine))
+            {
+                return false;
+            }
+
+            match &= info.Metadata.CaptureMachine.ToLowerInvariant().StartsWith(filterArgs.MachineName.Trim().ToLowerInvariant());
+        }
+
+        if (!string.IsNullOrWhiteSpace(filterArgs.MediaType))
+        {
+            if (string.IsNullOrWhiteSpace(info.Metadata?.Type))
+            {
+                return false;
+            }
+
+            match &= info.Metadata.Type.ToLowerInvariant().StartsWith(filterArgs.MediaType.Trim().ToLowerInvariant());
+        }
+
+        if (filterArgs.BeginDateTimeRange != null)
+        {
+            if (info.Metadata?.CreationDateTime == null)
+            {
+                return false;
+            }
+
+            match &= info.Metadata.CreationDateTime >= filterArgs.BeginDateTimeRange;
+        }
+
+        if (filterArgs.EndDateTimeRange != null)
+        {
+            if (info.Metadata?.CreationDateTime == null)
+            {
+                return false;
+            }
+
+            match &= info.Metadata.CreationDateTime <= filterArgs.EndDateTimeRange;
+        }
+        return match;
+    }
+
+    private Task FilterMediaCollection(MediaFilter.FilterArgs args)
+    {
+        filterArgs = args;
+        return ChangePage(0);
+        //TODO update pageCount
     }
 }
