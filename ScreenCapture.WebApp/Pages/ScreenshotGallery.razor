@@ -32,7 +32,7 @@
 
 <PageNavigationBar OnPageItemClick="ChangePage" PageCount="@pageCount" />
 
-<ModalContainer @ref="modal" FullScreen="true">
+<ModalContainer @ref="modal" ModalId="ZoomModal" FullScreen="true">
     <HeaderTemplate>
         @if (zoomedImage != null)
         {

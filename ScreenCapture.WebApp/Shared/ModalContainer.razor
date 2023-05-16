@@ -1,5 +1,5 @@
 ﻿@inject IJSRuntime js
-<div class="modal" id="modal-container" tabindex="-1" aria-hidden="true">
+<div id="@ModalId" class="modal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog @(FullScreen ? "modal-fullscreen" : string.Empty)">
         <div class="modal-content">
             <div class="modal-header text-light">
@@ -30,18 +30,19 @@
     [Parameter] public RenderFragment? BodyTemplate { get; set; }
     [Parameter] public RenderFragment? FooterTemplate { get; set; }
     [Parameter] public bool FullScreen { get; set; }
+    [Parameter] public string ModalId { get; set; } = "defaultId";
 
     private IJSObjectReference? module;
 
     public async Task Show()
     {
         module ??= await js.InvokeAsync<IJSObjectReference>("import", "./Shared/ModalContainer.razor.js");
-        await module.InvokeVoidAsync("showModal");
+        await module.InvokeVoidAsync("showModal", ModalId);
     }
 
     public async Task Hide()
     {
         module ??= await js.InvokeAsync<IJSObjectReference>("import", "./Shared/ModalContainer.razor.js");
-        await module.InvokeVoidAsync("hideModal");
+        await module.InvokeVoidAsync("hideModal", ModalId);
     }
 }

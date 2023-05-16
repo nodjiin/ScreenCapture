@@ -1,27 +1,32 @@
-﻿var modal;
+﻿const modals = new Map();
 
-export function showModal() {
-    if (modal === null || typeof modal === "undefined") {
-        const modalElement = document.getElementById("modal-container");
+function GetOrCreateModal(id) {
+    let modal;
+    if (modals.has(id)) {
+        modal = modals.get(id);
+    } else {
+        const modalElement = document.getElementById(id);
         if (modalElement === null || typeof modalElement === "undefined") {
-            return;
+            return null;
         }
 
         modal = new bootstrap.Modal(modalElement);
+        modals.set(id, modal);
     }
 
-    modal.show();
+    return modal;
 }
 
-export function hideModal() {
-    if (modal === null || typeof modal === "undefined") {
-        const modalElement = document.getElementById("modal-container");
-        if (modalElement === null || typeof modalElement === "undefined") {
-            return;
-        }
-
-        modal = new bootstrap.Modal(modalElement);
+export function showModal(id) {
+    const modal = GetOrCreateModal(id);
+    if (modal !== null && typeof modal !== "undefined") {
+        modal.show();
     }
+}
 
-    modal.hide();
+export function hideModal(id) {
+    const modal = GetOrCreateModal(id);
+    if (modal !== null && typeof modal !== "undefined") {
+        modal.hide();
+    }
 }
