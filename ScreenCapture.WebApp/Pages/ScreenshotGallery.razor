@@ -85,13 +85,11 @@
     private async Task ChangePage(int pageNumber)
     {
         mediaInfoCollection.Clear();
-
         var screenshots = await explorer.FindStoredScreenshots();
-        pageCount = (int)Math.Ceiling(((decimal)screenshots.Length) / pagesize);
 
         // we use the padding to keep the loop going in case we have to discard some media
-        int padding = 0;
-        for (int i = pageNumber; i < (pagesize * (pageNumber + 1) + padding) && i < screenshots.Length; i++)
+        int i, padding = 0;
+        for (i = pageNumber; i < (pagesize * (pageNumber + 1) + padding) && i < screenshots.Length; i++)
         {
             var info = await explorer.GetScreenshotInformation(screenshots[i]);
 
@@ -103,6 +101,28 @@
             }
 
             mediaInfoCollection.Add(info);
+        }
+
+        // recompute the pageCount at each call, to update the navigation item in case new elements have been added
+        if (filterArgs == null)
+        {
+            pageCount = (int)Math.Ceiling(((decimal)screenshots.Length) / pagesize);
+        }
+        else // if we have a filter going we need to finish evaluating the other items to be sure of the precise number of pages
+        {
+            while (i < screenshots.Length) // iterate on the whole array
+            {
+                var info = await explorer.GetScreenshotInformation(screenshots[i]);
+                if (info == null || (filterArgs != null && !MatchFilter(info, filterArgs)))
+                {
+                    padding++;
+                }
+
+                i++;
+            }
+
+            int filteredScrenshotsCount = i - padding;
+            pageCount = (int)Math.Ceiling(((decimal)filteredScrenshotsCount) / pagesize);
         }
 
         StateHasChanged();
@@ -179,6 +199,5 @@
     {
         filterArgs = args;
         return ChangePage(0);
-        //TODO update pageCount
     }
 }
