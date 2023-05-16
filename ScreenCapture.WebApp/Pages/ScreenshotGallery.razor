@@ -122,7 +122,14 @@
             }
 
             int filteredScrenshotsCount = i - padding;
-            pageCount = (int)Math.Ceiling(((decimal)filteredScrenshotsCount) / pagesize);
+            if (filteredScrenshotsCount > 0)
+            {
+                pageCount = (int)Math.Ceiling(((decimal)filteredScrenshotsCount) / pagesize);
+            }
+            else
+            {
+                pageCount = 1;
+            }
         }
 
         StateHasChanged();
