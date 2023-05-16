@@ -1,0 +1,138 @@
+﻿@*<InputText @bind-Value="machineName"/>*@
+
+<style>
+    /* quick animation to fix the hover effect. */
+    .btn-filter:hover {
+        filter: brightness(0.85);
+    }
+</style>
+<div>
+    @*Custom circle-shaped secondary button.
+    The default secondary button + filter icon combination is too hugly to be used. *@
+    <button class="btn btn-filter shadow-none border-0 text-secondary" @onclick="OpenFilterMenu">
+        <i class="bi bi-filter-circle-fill fs-3"></i>
+    </button>
+</div>
+
+<ModalContainer @ref="modal" FullScreen="false">
+    <HeaderTemplate>
+        <strong>Filters</strong>
+    </HeaderTemplate>
+    <BodyTemplate>
+        <div class="mt-2">
+            <div class="row mt-1">
+                <div class="col lh-lg">
+                    Media name:
+                </div>
+                <div class="col-auto">
+                    <InputText @bind-Value="mediaName" />
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="col lh-lg">
+                    Remote machine name:
+                </div>
+                <div class="col-auto">
+                    <InputText @bind-Value="machineName" />
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="col lh-lg">
+                    Media extension:
+                </div>
+                <div class="col-auto">
+                    <InputText @bind-Value="mediaType" />
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="col lh-lg">
+                    Start filter range:
+                </div>
+                <div class="col-auto">
+                    <InputDate @bind-Value="beginDateTimeRange" />
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="col lh-lg">
+                    end filter range:
+                </div>
+                <div class="col-auto">
+                    <InputDate @bind-Value="endDateTimeRange" />
+                </div>
+            </div>
+        </div>
+    </BodyTemplate>
+    <FooterTemplate>
+        <button class="btn btn-primary me-md-2" type="button" @onclick="ApplyFilterAsync">Confirm</button>
+        <button class="btn btn-light me-md-2" type="button" @onclick="ResetFilterArgs">Reset</button>
+        <button class="btn btn-secondary" type="button" @onclick="CloseFilterMenu">Cancel</button>
+    </FooterTemplate>
+</ModalContainer>
+
+@code {
+    public class FilterArgs
+    {
+        public string? MediaName { get; set; }
+        public string? MachineName { get; set; }
+        public string? MediaType { get; set; }
+        public DateTime? BeginDateTimeRange { get; set; }
+        public DateTime? EndDateTimeRange { get; set; }
+    }
+
+    // TODO range parameters for the various args
+    [Parameter] public EventCallback<FilterArgs> OnApplyFilter { get; set; }
+    private string? mediaName;
+    private string? machineName;
+    private string? mediaType;
+    private ModalContainer? modal;
+    private DateTime? beginDateTimeRange;
+    private DateTime? endDateTimeRange;
+
+    private async Task OpenFilterMenu()
+    {
+        if (modal == null)
+        {
+            return;
+        }
+
+        await modal.Show();
+    }
+
+    private async Task CloseFilterMenu()
+    {
+        if (modal == null)
+        {
+            return;
+        }
+
+        await modal.Hide();
+    }
+
+    private void ResetFilterArgs()
+    {
+        mediaName = null;
+        machineName = null;
+        mediaType = null;
+        beginDateTimeRange = null;
+        endDateTimeRange = null;
+    }
+
+    private async Task ApplyFilterAsync()
+    {
+        FilterArgs args = new()
+            {
+                MediaName = mediaName,
+                MachineName = machineName,
+                MediaType = mediaType,
+                BeginDateTimeRange = beginDateTimeRange,
+                EndDateTimeRange = endDateTimeRange
+            };
+
+        if (modal != null)
+        {
+            await modal.Hide();
+        }
+
+        await OnApplyFilter.InvokeAsync(args);
+    }
+}

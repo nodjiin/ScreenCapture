@@ -44,4 +44,10 @@
         module ??= await js.InvokeAsync<IJSObjectReference>("import", "./Shared/ModalContainer.razor.js");
         await module.InvokeVoidAsync("showModal");
     }
+
+    public async Task Hide()
+    {
+        module ??= await js.InvokeAsync<IJSObjectReference>("import", "./Shared/ModalContainer.razor.js");
+        await module.InvokeVoidAsync("hideModal");
+    }
 }

@@ -6,14 +6,19 @@
 
 <PageTitle>Screenshots Gallery</PageTitle>
 
-<CollectionGridDisplayer Collection="mediaInfoCollection">
-    <EmptyCollectionTemplate>
-        <text>No screenshot has been found.</text>
-    </EmptyCollectionTemplate>
-    <CollectionItemTemplate>
-        <ImageDisplayer Info="@context" OnClick="OpenZoomedImage" />
-    </CollectionItemTemplate>
-</CollectionGridDisplayer>
+<div class="d-flex flex-row">
+    <CollectionGridDisplayer Collection="mediaInfoCollection">
+        <EmptyCollectionTemplate>
+            <text>No screenshot has been found.</text>
+        </EmptyCollectionTemplate>
+        <CollectionItemTemplate>
+            <ImageDisplayer Info="@context" OnClick="OpenZoomedImage" />
+        </CollectionItemTemplate>
+    </CollectionGridDisplayer>
+
+    <MediaFilter OnApplyFilter="FilterMediaCollection" />
+
+</div>
 
 <PageNavigationBar OnPageItemClick="ChangePage" PageCount="@pageCount" />
 
@@ -55,6 +60,7 @@
     private int pageCount = 1;
     private MediaInfo<Metadata>? zoomedImage;
     private ModalContainer? modal;
+    MediaFilter.FilterArgs? filterArgs;
 
     protected override async Task OnAfterRenderAsync(bool first)
     {
@@ -71,16 +77,40 @@
         var screenshots = await explorer.FindStoredScreenshots();
         pageCount = (int)Math.Ceiling(((decimal)screenshots.Length) / pagesize);
 
-        for (int i = pageNumber; i < pagesize * (pageNumber + 1) && i < screenshots.Length; i++)
+        // we use the padding to keep the loop going in case we have to discard some media
+        int padding = 0;
+        for (int i = pageNumber; i < pagesize * (pageNumber + 1) + padding && i < screenshots.Length; i++)
         {
             var info = await explorer.GetScreenshotInformation(screenshots[i]);
-            if (info != null)
+
+            // check that info are valid and match the filter (if any)
+            if (info == null || (filterArgs != null && !MatchFilter(info, filterArgs)))
             {
-                mediaInfoCollection.Add(info);
+                padding++;
+                continue;
             }
+
+            mediaInfoCollection.Add(info);
         }
 
         StateHasChanged();
+    }
+
+    private bool MatchFilter(MediaInfo<Metadata> info, MediaFilter.FilterArgs filterArgs)
+    {
+        bool match = true;
+
+        if (!string.IsNullOrWhiteSpace(filterArgs.MachineName))
+        {
+            if (string.IsNullOrWhiteSpace(info.Metadata?.CaptureMachine))
+            {
+                return false;
+            }
+
+            match &= info.Metadata.CaptureMachine.ToLowerInvariant().StartsWith(filterArgs.MachineName.Trim().ToLowerInvariant());
+        }
+
+        return match;
     }
 
     private async Task OpenZoomedImage(MediaInfo<Metadata>? info)
@@ -92,5 +122,12 @@
 
         zoomedImage = info;
         await modal.Show();
+    }
+
+    private Task FilterMediaCollection(MediaFilter.FilterArgs args)
+    {
+        filterArgs = args;
+        return ChangePage(0);
+        //TODO update pageCount
     }
 }
